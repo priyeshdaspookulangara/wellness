@@ -1,0 +1,28 @@
+/* Custom styles for Wellness Wonders Admin Panel */
+
+/* Using styles directly in admin/includes/header.php for the sidebar for now.
+   This file can be used for more specific component styling later. */
+
+.card-header {
+    font-weight: bold;
+}
+
+/* Example: Style for action buttons in tables */
+.table .action-buttons a, .table .action-buttons button {
+    margin-right: 5px;
+    margin-bottom: 5px; /* For smaller screens */
+}
+
+.table .action-buttons .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Responsive table */
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+/* Add more admin-specific styles here */
