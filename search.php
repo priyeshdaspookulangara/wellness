@@ -49,7 +49,28 @@ require_once 'templates/header.php';
                             <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"><?php echo htmlspecialchars($product['name']); ?></a>
                         </h5>
                         <p class="card-text"><strong>$<?php echo htmlspecialchars($product['price']); ?></strong></p>
-                        <button class="btn btn-primary btn-block add-to-cart-btn" data-product-id="<?php echo $product['id']; ?>">Add to Cart</button>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-primary add-to-cart-btn" data-product-id="<?php echo $product['id']; ?>"><i class="fas fa-shopping-cart"></i> Cart</button>
+                            <?php
+                            // Fetch total likes for this product
+                            $total_likes_search = 0;
+                            if (isset($conn) && isset($product['id'])) {
+                                $sql_total_likes_search = "SELECT COUNT(id) as count FROM user_product_likes WHERE product_id = " . (int)$product['id'];
+                                $res_total_likes_search = mysqli_query($conn, $sql_total_likes_search);
+                                if ($res_total_likes_search) {
+                                    $total_likes_data_search = mysqli_fetch_assoc($res_total_likes_search);
+                                    $total_likes_search = (int)$total_likes_data_search['count'];
+                                }
+                            }
+                            ?>
+                            <button class="btn btn-sm btn-outline-danger like-product-btn"
+                                    data-product-id="<?php echo $product['id']; ?>"
+                                    data-action="like"
+                                    title="Like Product"
+                                    <?php echo !isset($_SESSION['user_id']) ? 'disabled' : ''; ?>>
+                                <i class="fas fa-heart"></i> (<span class="like-count"><?php echo $total_likes_search; ?></span>)
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

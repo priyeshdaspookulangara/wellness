@@ -125,9 +125,40 @@ require_once 'templates/header.php';
         <button class="btn btn-primary btn-lg mr-2 add-to-cart-btn" data-product-id="<?php echo $product['id']; ?>" <?php echo $product['stock'] <= 0 ? 'disabled' : ''; ?>>
             <i class="fas fa-shopping-cart"></i> Add to Cart
         </button>
-        <button class="btn btn-success btn-lg buy-now-btn" data-product-id="<?php echo $product['id']; ?>" <?php echo $product['stock'] <= 0 ? 'disabled' : ''; ?>>
+        <button class="btn btn-success btn-lg mr-2 buy-now-btn" data-product-id="<?php echo $product['id']; ?>" <?php echo $product['stock'] <= 0 ? 'disabled' : ''; ?>>
             Buy Now
         </button>
+        <?php
+        $is_liked_by_user = false;
+        $total_likes = 0;
+        if (isset($_SESSION['user_id']) && isset($product['id'])) {
+            $sql_check_like = "SELECT id FROM user_product_likes WHERE user_id = " . (int)$_SESSION['user_id'] . " AND product_id = " . (int)$product['id'];
+            $res_check_like = mysqli_query($conn, $sql_check_like);
+            if ($res_check_like && mysqli_num_rows($res_check_like) > 0) {
+                $is_liked_by_user = true;
+            }
+        }
+        // Get total likes for the product
+        if (isset($product['id'])) {
+            $sql_total_likes = "SELECT COUNT(id) as count FROM user_product_likes WHERE product_id = " . (int)$product['id'];
+            $res_total_likes = mysqli_query($conn, $sql_total_likes);
+            if ($res_total_likes) {
+                $total_likes_data = mysqli_fetch_assoc($res_total_likes);
+                $total_likes = (int)$total_likes_data['count'];
+            }
+        }
+        ?>
+        <button class="btn btn-outline-danger btn-lg like-product-btn <?php echo $is_liked_by_user ? 'active' : ''; ?>"
+                data-product-id="<?php echo $product['id']; ?>"
+                data-action="<?php echo $is_liked_by_user ? 'unlike' : 'like'; ?>"
+                title="<?php echo $is_liked_by_user ? 'Unlike Product' : 'Like Product'; ?>"
+                <?php echo !isset($_SESSION['user_id']) ? 'disabled' : ''; ?>>
+            <i class="fas fa-heart"></i> <span class="like-text"><?php echo $is_liked_by_user ? 'Liked' : 'Like'; ?></span>
+            (<span class="like-count"><?php echo $total_likes; ?></span>)
+        </button>
+        <?php if (!isset($_SESSION['user_id'])): ?>
+            <small class="form-text text-muted d-block">Login to like products.</small>
+        <?php endif; ?>
 
         <hr>
 

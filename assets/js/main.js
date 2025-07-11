@@ -87,4 +87,64 @@ $(document).ready(function() {
     // For now, if you haven't, add this in your templates/header.php:
     // <script>var SITE_URL = "<?php echo SITE_URL; ?>";</script>
     // This is crucial for the AJAX URL to work correctly.
+
+
+    // AJAX Like/Unlike Product
+    $(document).on('click', '.like-product-btn', function(e) {
+        e.preventDefault();
+        var $thisButton = $(this);
+        var productId = $thisButton.data('product-id');
+        var currentAction = $thisButton.data('action'); // 'like' or 'unlike'
+
+        if (!productId) {
+            console.error('Product ID not found for like button.');
+            return;
+        }
+
+        // Disable button to prevent multiple clicks
+        $thisButton.prop('disabled', true);
+        var originalIconHtml = $thisButton.find('i.fa-heart').clone(); // Store original icon
+        $thisButton.find('i.fa-heart').removeClass('fa-heart').addClass('fa-spinner fa-spin');
+
+
+        $.ajax({
+            url: SITE_URL + '/like_action.php',
+            type: 'POST',
+            data: {
+                product_id: productId,
+                action: currentAction
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $thisButton.find('.like-count').text(response.like_count);
+                    if (response.is_liked) {
+                        $thisButton.addClass('active').data('action', 'unlike').attr('title', 'Unlike Product');
+                        $thisButton.find('.like-text').text('Liked'); // For product detail page button
+                    } else {
+                        $thisButton.removeClass('active').data('action', 'like').attr('title', 'Like Product');
+                        $thisButton.find('.like-text').text('Like'); // For product detail page button
+                    }
+                } else {
+                    // Handle error - e.g., show message from response.message
+                    // For now, just log it and revert button visually if needed
+                    console.warn('Like/Unlike Error:', response.message);
+                    // Potentially show a more user-friendly error message
+                    if(response.message === 'You must be logged in to like products.') {
+                        // Optionally redirect to login or show a modal
+                        alert(response.message);
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Like Error:", status, error, xhr.responseText);
+                // alert('An error occurred. Please try again.');
+            },
+            complete: function() {
+                // Re-enable button and restore icon
+                $thisButton.prop('disabled', false);
+                $thisButton.find('i.fa-spinner.fa-spin').replaceWith(originalIconHtml);
+            }
+        });
+    });
 });

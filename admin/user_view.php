@@ -221,6 +221,7 @@ if($res_user_orders) {
     <div class="col-md-12">
         <h4>Recent Order History (Last 10)</h4>
         <?php if(!empty($user_orders)): ?>
+        <div class="table-responsive">
         <table class="table table-sm table-striped">
             <thead>
                 <tr>
@@ -243,8 +244,60 @@ if($res_user_orders) {
                 <?php endforeach; ?>
             </tbody>
         </table>
+        </div>
         <?php else: ?>
         <p>No orders found for this user.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h4>Liked Products by This User</h4>
+        <?php
+        $user_liked_products = [];
+        $sql_user_likes = "SELECT p.id, p.name, p.slug, upl.created_at as liked_at
+                           FROM user_product_likes upl
+                           JOIN products p ON upl.product_id = p.id
+                           WHERE upl.user_id = $user_id_to_view
+                           ORDER BY upl.created_at DESC";
+        $res_user_likes = mysqli_query($conn, $sql_user_likes);
+        if($res_user_likes) {
+            while($like_row = mysqli_fetch_assoc($res_user_likes)) {
+                $user_liked_products[] = $like_row;
+            }
+        }
+        ?>
+        <?php if(!empty($user_liked_products)): ?>
+        <div class="table-responsive">
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Liked On</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach($user_liked_products as $liked_prod): ?>
+                <tr>
+                    <td><?php echo $liked_prod['id']; ?></td>
+                    <td><a href="<?php echo SITE_URL . '/product/' . htmlspecialchars($liked_prod['slug']); ?>" target="_blank"><?php echo htmlspecialchars($liked_prod['name']); ?></a></td>
+                    <td><?php echo date("M j, Y, g:i a", strtotime($liked_prod['liked_at'])); ?></td>
+                    <td>
+                        <a href="product_edit.php?id=<?php echo $liked_prod['id']; ?>" class="btn btn-xs btn-outline-secondary">View Product</a>
+                        <!-- Option to remove like by admin? Maybe too much for this scope -->
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
+        <?php else: ?>
+        <p>This user has not liked any products yet.</p>
         <?php endif; ?>
     </div>
 </div>

@@ -19,10 +19,19 @@ require_once 'templates/header.php';
             <div class="card mb-4">
                 <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="Product Name">
                 <div class="card-body">
-                    <h5 class="card-title">New Product 1</h5>
+                    <h5 class="card-title"><a href="#">New Product 1</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$19.99</strong></p>
-                    <a href="#" class="btn btn-primary">View Details</a>
+                    <div class="d-flex justify-content-between align-items-center">
+                         <button class="btn btn-primary add-to-cart-btn" data-product-id="1"> <!-- Placeholder ID -->
+                            <i class="fas fa-shopping-cart"></i> Cart
+                         </button>
+                         <button class="btn btn-sm btn-outline-danger like-product-btn"
+                                data-product-id="1" data-action="like" title="Like Product"
+                                <?php echo !isset($_SESSION['user_id']) ? 'disabled' : ''; ?>>
+                            <i class="fas fa-heart"></i> (<span class="like-count">0</span>) <!-- Placeholder count -->
+                         </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -30,10 +39,19 @@ require_once 'templates/header.php';
             <div class="card mb-4">
                 <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="Product Name">
                 <div class="card-body">
-                    <h5 class="card-title">New Product 2</h5>
+                    <h5 class="card-title"><a href="#">New Product 2</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$29.99</strong></p>
-                    <a href="#" class="btn btn-primary">View Details</a>
+                     <div class="d-flex justify-content-between align-items-center">
+                         <button class="btn btn-primary add-to-cart-btn" data-product-id="2"> <!-- Placeholder ID -->
+                            <i class="fas fa-shopping-cart"></i> Cart
+                         </button>
+                         <button class="btn btn-sm btn-outline-danger like-product-btn"
+                                data-product-id="2" data-action="like" title="Like Product"
+                                <?php echo !isset($_SESSION['user_id']) ? 'disabled' : ''; ?>>
+                            <i class="fas fa-heart"></i> (<span class="like-count">0</span>)
+                         </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -41,10 +59,19 @@ require_once 'templates/header.php';
             <div class="card mb-4">
                 <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="Product Name">
                 <div class="card-body">
-                    <h5 class="card-title">New Product 3</h5>
+                    <h5 class="card-title"><a href="#">New Product 3</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$39.99</strong></p>
-                    <a href="#" class="btn btn-primary">View Details</a>
+                     <div class="d-flex justify-content-between align-items-center">
+                         <button class="btn btn-primary add-to-cart-btn" data-product-id="3"> <!-- Placeholder ID -->
+                            <i class="fas fa-shopping-cart"></i> Cart
+                         </button>
+                         <button class="btn btn-sm btn-outline-danger like-product-btn"
+                                data-product-id="3" data-action="like" title="Like Product"
+                                <?php echo !isset($_SESSION['user_id']) ? 'disabled' : ''; ?>>
+                            <i class="fas fa-heart"></i> (<span class="like-count">0</span>)
+                         </button>
+                    </div>
                 </div>
             </div>
         </div>
