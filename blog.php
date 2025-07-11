@@ -39,20 +39,20 @@ require_once 'templates/header.php';
                         <div class="row no-gutters">
                             <?php if (!empty($post['image_url'])): ?>
                             <div class="col-md-4">
-                                <a href="<?php echo SITE_URL . '/blog/' . htmlspecialchars($post['slug']); ?>">
+                                <a href="<?php echo SITE_URL . '/article.php?slug=' . htmlspecialchars($post['slug']); ?>">
                                     <img src="<?php echo SITE_URL . '/uploads/blog/' . htmlspecialchars($post['image_url']); ?>" class="card-img" alt="<?php echo htmlspecialchars($post['title']); ?>" style="object-fit: cover; height: 100%;">
                                 </a>
                             </div>
                             <?php endif; ?>
                             <div class="col-md-<?php echo !empty($post['image_url']) ? '8' : '12'; ?>">
                                 <div class="card-body d-flex flex-column h-100">
-                                    <h3 class="card-title"><a href="<?php echo SITE_URL . '/blog/' . htmlspecialchars($post['slug']); ?>"><?php echo htmlspecialchars($post['title']); ?></a></h3>
+                                    <h3 class="card-title"><a href="<?php echo SITE_URL . '/article.php?slug=' . htmlspecialchars($post['slug']); ?>"><?php echo htmlspecialchars($post['title']); ?></a></h3>
                                     <p class="card-text text-muted">
                                         <small>Published on <?php echo date("F j, Y", strtotime($post['published_at'])); ?></small>
                                         <?php /* Add author later if desired: by AuthorName */ ?>
                                     </p>
                                     <p class="card-text flex-grow-1"><?php echo nl2br(htmlspecialchars($post['excerpt'] ?? substr(strip_tags($post['content'] ?? ''), 0, 150) . '...')); ?></p>
-                                    <a href="<?php echo SITE_URL . '/blog/' . htmlspecialchars($post['slug']); ?>" class="btn btn-sm btn-outline-primary align-self-start">Read More &raquo;</a>
+                                    <a href="<?php echo SITE_URL . '/article.php?slug=' . htmlspecialchars($post['slug']); ?>" class="btn btn-sm btn-outline-primary align-self-start">Read More &raquo;</a>
                                 </div>
                             </div>
                         </div>

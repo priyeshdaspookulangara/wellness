@@ -76,7 +76,7 @@ $all_statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', '
                         <?php foreach ($order_items as $item): ?>
                         <tr>
                             <td>
-                                <a href="<?php echo SITE_URL . '/product/' . htmlspecialchars($item['product_slug'] ?? $item['product_id']); ?>" target="_blank">
+                                <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($item['product_slug'] ?? $item['product_id']); ?>" target="_blank"> <!-- Assuming product_slug is available, otherwise fallback to ID which might not work if product.php expects slug -->
                                     <?php echo htmlspecialchars($item['product_name_at_purchase']); ?>
                                 </a>
                                 <br><small class="text-muted">Product ID: <?php echo $item['product_id']; ?></small>

@@ -84,7 +84,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                         <td><?php echo $post_item['published_at'] ? date("M j, Y", strtotime($post_item['published_at'])) : 'Not Published'; ?></td>
                         <td class="action-buttons">
                             <a href="blog_edit.php?id=<?php echo $post_item['id']; ?>" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="<?php echo SITE_URL . '/blog/' . htmlspecialchars($post_item['slug']); ?>" target="_blank" class="btn btn-sm btn-success" title="View Post"><i class="fas fa-eye"></i></a>
+                            <a href="<?php echo SITE_URL . '/article.php?slug=' . htmlspecialchars($post_item['slug']); ?>" target="_blank" class="btn btn-sm btn-success" title="View Post"><i class="fas fa-eye"></i></a>
                             <a href="blog_delete.php?id=<?php echo $post_item['id']; ?>" class="btn btn-sm btn-danger confirm-delete" title="Delete"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>

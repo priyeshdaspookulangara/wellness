@@ -17,9 +17,11 @@ require_once 'templates/header.php';
         <!-- Placeholder for new arrival products -->
         <div class="col-md-4">
             <div class="card mb-4">
-                <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="Product Name">
+                <a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-1-slug"> <!-- Example Link -->
+                    <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="New Product 1">
+                </a>
                 <div class="card-body">
-                    <h5 class="card-title"><a href="#">New Product 1</a></h5>
+                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-1-slug">New Product 1</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$19.99</strong></p>
                     <div class="d-flex justify-content-between align-items-center">
@@ -37,9 +39,11 @@ require_once 'templates/header.php';
         </div>
         <div class="col-md-4">
             <div class="card mb-4">
-                <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="Product Name">
+                <a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-2-slug"> <!-- Example Link -->
+                    <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="New Product 2">
+                </a>
                 <div class="card-body">
-                    <h5 class="card-title"><a href="#">New Product 2</a></h5>
+                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-2-slug">New Product 2</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$29.99</strong></p>
                      <div class="d-flex justify-content-between align-items-center">
@@ -57,9 +61,11 @@ require_once 'templates/header.php';
         </div>
         <div class="col-md-4">
             <div class="card mb-4">
-                <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="Product Name">
+                 <a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-3-slug"> <!-- Example Link -->
+                    <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="New Product 3">
+                </a>
                 <div class="card-body">
-                    <h5 class="card-title"><a href="#">New Product 3</a></h5>
+                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-3-slug">New Product 3</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$39.99</strong></p>
                      <div class="d-flex justify-content-between align-items-center">

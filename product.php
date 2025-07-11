@@ -69,8 +69,8 @@ require_once 'templates/header.php';
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>">Home</a></li>
-    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/category.php?slug=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars($product['category_name']); ?></a></li>
+    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/index.php">Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/category.php?slug=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars($product['category_name']); ?></a></li> <!-- Assuming category.php uses slug -->
     <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($product['name']); ?></li>
   </ol>
 </nav>

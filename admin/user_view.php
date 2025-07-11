@@ -285,7 +285,7 @@ if($res_user_orders) {
                 <?php foreach($user_liked_products as $liked_prod): ?>
                 <tr>
                     <td><?php echo $liked_prod['id']; ?></td>
-                    <td><a href="<?php echo SITE_URL . '/product/' . htmlspecialchars($liked_prod['slug']); ?>" target="_blank"><?php echo htmlspecialchars($liked_prod['name']); ?></a></td>
+                    <td><a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($liked_prod['slug']); ?>" target="_blank"><?php echo htmlspecialchars($liked_prod['name']); ?></a></td>
                     <td><?php echo date("M j, Y, g:i a", strtotime($liked_prod['liked_at'])); ?></td>
                     <td>
                         <a href="product_edit.php?id=<?php echo $liked_prod['id']; ?>" class="btn btn-xs btn-outline-secondary">View Product</a>

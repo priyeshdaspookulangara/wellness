@@ -32,10 +32,10 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownCategories">
                         <!-- Categories will be populated dynamically later -->
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/category.php?slug=magnetic-bracelets">Magnetic Bracelets</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/category.php?slug=magnetic-bracelets">Magnetic Bracelets</a> <!-- Assuming category.php still uses slug -->
                         <a class="dropdown-item" href="<?php echo SITE_URL; ?>/category.php?slug=wellness-supplements">Wellness Supplements</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/categories.php">All Categories</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/categories.php">All Categories</a> <!-- categories.php to list all cats -->
                     </div>
                 </li>
                 <li class="nav-item <?php echo ($page_title ?? '') == 'About Us' ? 'active' : ''; ?>">

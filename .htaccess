@@ -1,28 +1,13 @@
 # Apache Server Configs
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /wellness-platform/ # Adjust this if your project is in a subdirectory
-
-    # Rule to remove .php extension from filenames
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME}\.php -f
-    RewriteRule ^(.*)$ $1.php [NC,L]
-
-    # Clean URL rules for products and categories
-    RewriteRule ^product/([^/.]+)/?$ product.php?slug=$1 [L,QSA]
-    RewriteRule ^category/([^/.]+)/?$ category.php?slug=$1 [L,QSA]
-    RewriteRule ^search/?$ search.php [L,QSA]
-
-    # Clean URL rules for blog
-    RewriteRule ^blog/?$ blog.php [L,QSA]
-    RewriteRule ^blog/([^/.]+)/?$ article.php?slug=$1 [L,QSA]
-
+    # RewriteBase /wellness-platform/ # Adjust if your project is in a subdirectory.
+                                     # Not strictly necessary if not using complex relative rewrites without clean URLs.
 </IfModule>
 
 # Custom Error Pages
-ErrorDocument 404 /wellness-platform/404.php
-# ErrorDocument 403 /wellness-platform/403.php # Example for 403
-# ErrorDocument 500 /wellness-platform/500.php # Example for 500
+ErrorDocument 404 /wellness-platform/404.php # Adjust path if RewriteBase is changed or project is in root.
+                                           # Or use an absolute path from web root: /404.php if in root.
 
 # Disable directory browsing
 Options -Indexes
@@ -35,5 +20,5 @@ AddDefaultCharset UTF-8
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
-    # Header set Content-Security-Policy "default-src 'self';" # Be cautious with CSP, it can break things if not configured correctly
+    # Header set Content-Security-Policy "default-src 'self';"
 </IfModule>

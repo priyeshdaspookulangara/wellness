@@ -8,7 +8,7 @@ $post = null;
 
 if (!$article_slug) {
     // Redirect or show 404 if no slug
-    header("Location: " . SITE_URL . "/blog.php");
+    header("Location: " . SITE_URL . "/blog.php"); // This already points to blog.php
     exit;
 }
 
@@ -86,7 +86,7 @@ require_once 'templates/header.php';
             -->
 
             <div class="text-center mt-4">
-                <a href="<?php echo SITE_URL; ?>/blog.php" class="btn btn-outline-secondary">&laquo; Back to Blog</a>
+                <a href="<?php echo SITE_URL; ?>/blog.php" class="btn btn-outline-secondary">&laquo; Back to Blog</a> <!-- This is already correct -->
             </div>
 
         </div>

@@ -41,12 +41,12 @@ require_once 'templates/header.php';
         <?php foreach ($products as $product): ?>
             <div class="col-md-4 mb-4">
                 <div class="card">
-                     <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>">
+                     <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"> <!-- Assuming product.php uses slug -->
                         <img src="<?php echo htmlspecialchars($product['image_url_main']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     </a>
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"><?php echo htmlspecialchars($product['name']); ?></a>
+                            <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"><?php echo htmlspecialchars($product['name']); ?></a> <!-- Assuming product.php uses slug -->
                         </h5>
                         <p class="card-text"><strong>$<?php echo htmlspecialchars($product['price']); ?></strong></p>
                         <div class="d-flex justify-content-between align-items-center">
