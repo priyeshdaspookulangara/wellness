@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../config.php'; // Adjusted path
+require_once __DIR__ . '/../includes/db.php'; // Adjusted path
 
 $page_title = "Checkout";
 
@@ -9,7 +9,7 @@ $page_title = "Checkout";
 if (empty($_SESSION['cart'])) {
     $_SESSION['cart_message'] = "Your cart is empty. Please add products before proceeding to checkout.";
     $_SESSION['cart_message_type'] = "warning";
-    header("Location: cart.php");
+    header("Location: " . SITE_URL . "cart/"); // Updated redirect
     exit;
 }
 
@@ -40,7 +40,7 @@ if ($user_id) {
 }
 
 
-// Calculate cart totals again (could be passed from cart.php or recalculated for integrity)
+// Calculate cart totals again
 $cart_items = $_SESSION['cart'];
 $subtotal = 0;
 $total_items_in_cart = 0;
@@ -56,7 +56,6 @@ if (!empty($cart_items)) {
             $quantity = $cart_items[$prod['id']]['quantity'];
              if ($quantity > $prod['stock']) {
                 $errors[] = "Not enough stock for " . htmlspecialchars($prod['name']) . ". Available: " . $prod['stock'] . ", Requested: " . $quantity . ". Please update your cart.";
-                // In a real scenario, you might redirect back to cart.php here or handle more gracefully.
             }
             $subtotal += $prod['price'] * $quantity;
             $total_items_in_cart += $quantity;
@@ -69,23 +68,23 @@ if (!empty($cart_items)) {
     }
 }
 
-if ($total_items_in_cart == 0 && empty($errors)) { // Double check if cart became empty due to stock issues resolved elsewhere
+if ($total_items_in_cart == 0 && empty($errors)) {
     $_SESSION['cart_message'] = "Your cart is effectively empty or items are out of stock.";
     $_SESSION['cart_message_type'] = "warning";
-    header("Location: cart.php");
+    header("Location: " . SITE_URL . "cart/"); // Updated redirect
     exit;
 }
 
 
-$shipping_cost = 5.00; // Hardcoded flat rate
+$shipping_cost = 5.00;
 $grand_total = $subtotal + $shipping_cost;
 
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors) /* Only process if no initial stock errors */) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
     // Sanitize and validate input
     $checkout_data['email'] = trim($_POST['email'] ?? '');
     $checkout_data['first_name'] = trim($_POST['first_name'] ?? '');
+    // ... (rest of sanitization as before) ...
     $checkout_data['last_name'] = trim($_POST['last_name'] ?? '');
     $checkout_data['address_street'] = trim($_POST['address_street'] ?? '');
     $checkout_data['address_city'] = trim($_POST['address_city'] ?? '');
@@ -96,23 +95,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors) /* Only process if n
     $checkout_data['notes'] = trim($_POST['notes'] ?? '');
     $checkout_data['payment_method'] = trim($_POST['payment_method'] ?? 'placeholder_cod');
 
-    // Basic validation
+
     if (!filter_var($checkout_data['email'], FILTER_VALIDATE_EMAIL)) $errors[] = "Valid email is required.";
     if (empty($checkout_data['first_name'])) $errors[] = "First name is required.";
+    // ... (rest of validation as before) ...
     if (empty($checkout_data['last_name'])) $errors[] = "Last name is required.";
     if (empty($checkout_data['address_street'])) $errors[] = "Street address is required.";
     if (empty($checkout_data['address_city'])) $errors[] = "City is required.";
     if (empty($checkout_data['address_zip'])) $errors[] = "ZIP / Postal code is required.";
     if (empty($checkout_data['address_country'])) $errors[] = "Country is required.";
-    // Add more validation as needed (phone format, etc.)
+
 
     if (empty($errors)) {
-        // All good, proceed to "place order" (dummy for now)
-        // Start transaction (if your DB supports it and you want to ensure atomicity)
-        mysqli_autocommit($conn, false); // Start transaction
+        mysqli_autocommit($conn, false);
         $order_placed_successfully = false;
 
         $user_id_sql = $user_id ? (int)$user_id : 'NULL';
+        // ... (all escape_string calls as before) ...
         $email_esc = escape_string($checkout_data['email']);
         $fname_esc = escape_string($checkout_data['first_name']);
         $lname_esc = escape_string($checkout_data['last_name']);
@@ -142,16 +141,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors) /* Only process if n
             $order_items_inserted_successfully = true;
 
             foreach ($product_details_for_order as $product_id_ordered => $item) {
+                // ... (stock update and item insert logic as before) ...
                 $prod_id_esc = (int)$product_id_ordered;
                 $qty_esc = (int)$item['quantity'];
                 $price_esc = (float)$item['price_at_purchase'];
                 $prod_name_esc = escape_string($item['name']);
 
-                // Decrement stock
                 $sql_update_stock = "UPDATE products SET stock = stock - $qty_esc WHERE id = $prod_id_esc AND stock >= $qty_esc";
                 if (!mysqli_query($conn, $sql_update_stock) || mysqli_affected_rows($conn) == 0) {
                     $errors[] = "Failed to update stock for product " . htmlspecialchars($item['name']) . ". Order cancelled.";
-                    $order_items_inserted_successfully = false; // This will trigger a rollback
+                    $order_items_inserted_successfully = false;
                     break;
                 }
 
@@ -159,38 +158,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors) /* Only process if n
                                     VALUES ($order_id, $prod_id_esc, $qty_esc, $price_esc, '$prod_name_esc', NOW())";
                 if (!mysqli_query($conn, $sql_insert_item)) {
                     $errors[] = "Failed to save order item: " . htmlspecialchars($item['name']) . ". Error: " . mysqli_error($conn);
-                    $order_items_inserted_successfully = false; // This will trigger a rollback
+                    $order_items_inserted_successfully = false;
                     break;
                 }
             }
 
             if ($order_items_inserted_successfully) {
-                mysqli_commit($conn); // Commit transaction
+                mysqli_commit($conn);
                 $order_placed_successfully = true;
             } else {
-                mysqli_rollback($conn); // Rollback on error with items or stock
+                mysqli_rollback($conn);
             }
-
         } else {
             $errors[] = "Failed to create order. Error: " . mysqli_error($conn);
-            mysqli_rollback($conn); // Rollback on order creation failure
+            mysqli_rollback($conn);
         }
-        mysqli_autocommit($conn, true); // Restore autocommit
-
+        mysqli_autocommit($conn, true);
 
         if ($order_placed_successfully) {
-            // Clear the cart
             $_SESSION['cart'] = [];
-            // Redirect to an order success page
-            header("Location: order_success.php?order_id=" . $order_id);
+            header("Location: " . SITE_URL . "order_success/?order_id=" . $order_id); // Updated redirect
             exit;
         }
-        // Errors occurred, they will be displayed below the form
     }
 }
 
-
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Adjusted path
 ?>
 
 <div class="container py-5">
@@ -207,11 +200,12 @@ require_once 'templates/header.php';
         </div>
     <?php endif; ?>
 
-    <form action="checkout.php" method="POST">
+    <form action="<?php echo SITE_URL; ?>checkout/" method="POST"> <!-- Updated form action -->
         <div class="row">
             <div class="col-md-7">
                 <h4>Shipping Address</h4>
                 <hr>
+                <!-- Form fields as before -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="first_name">First Name</label>
@@ -276,13 +270,12 @@ require_once 'templates/header.php';
                     </label>
                     <small class="form-text text-muted">This is a dummy payment method. No actual payment will be processed.</small>
                 </div>
-                <!-- Add other dummy payment methods if desired -->
-
             </div>
 
             <div class="col-md-5">
                 <h4>Your Order</h4>
                 <hr>
+                <!-- Order summary table as before -->
                 <table class="table table-sm">
                     <tbody>
                         <?php foreach ($product_details_for_order as $item_id => $item): ?>
@@ -315,5 +308,5 @@ require_once 'templates/header.php';
 </div>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Adjusted path
 ?>

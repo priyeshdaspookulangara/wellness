@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../config.php'; // Corrected
+require_once __DIR__ . '/../includes/db.php'; // Corrected
 
 $article_slug = $_GET['slug'] ?? null;
 $post = null;
@@ -26,14 +26,14 @@ if ($result_article && mysqli_num_rows($result_article) > 0) {
     // Article not found or not published, show a 404 or redirect
     http_response_code(404);
     $page_title = "Article Not Found";
-    require_once 'templates/header.php';
-    echo "<div class='container py-5 text-center'><p class='lead'>Sorry, the article you are looking for was not found or is not available.</p><a href='" . SITE_URL . "/blog.php' class='btn btn-primary'>Back to Blog</a></div>";
-    require_once 'templates/footer.php';
+    require_once __DIR__ . '/../templates/header.php'; // Corrected
+    echo "<div class='container py-5 text-center'><p class='lead'>Sorry, the article you are looking for was not found or is not available.</p><a href='" . SITE_URL . "blog/' class='btn btn-primary'>Back to Blog</a></div>"; // Link updated
+    require_once __DIR__ . '/../templates/footer.php'; // Corrected
     exit;
 }
 
 $page_title = htmlspecialchars($post['title']);
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Corrected
 ?>
 
 <div class="container py-5">
@@ -86,7 +86,7 @@ require_once 'templates/header.php';
             -->
 
             <div class="text-center mt-4">
-                <a href="<?php echo SITE_URL; ?>/blog.php" class="btn btn-outline-secondary">&laquo; Back to Blog</a> <!-- This is already correct -->
+                <a href="<?php echo SITE_URL; ?>blog/" class="btn btn-outline-secondary">&laquo; Back to Blog</a> <!-- Updated link -->
             </div>
 
         </div>
@@ -117,5 +117,5 @@ require_once 'templates/header.php';
 </style>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Corrected
 ?>

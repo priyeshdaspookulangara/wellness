@@ -24,7 +24,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item <?php echo ($page_title ?? '') == 'Homepage' ? 'active' : ''; ?>">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/index.php">Home</a>
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>">Home</a> <!-- index.php is at root -->
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCategories" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -32,33 +32,33 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownCategories">
                         <!-- Categories will be populated dynamically later -->
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/category.php?slug=magnetic-bracelets">Magnetic Bracelets</a> <!-- Assuming category.php still uses slug -->
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/category.php?slug=wellness-supplements">Wellness Supplements</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>category/?slug=magnetic-bracelets">Magnetic Bracelets</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>category/?slug=wellness-supplements">Wellness Supplements</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/categories.php">All Categories</a> <!-- categories.php to list all cats -->
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>categories/">All Categories</a> <!-- Assuming categories/index.php will be created -->
                     </div>
                 </li>
                 <li class="nav-item <?php echo ($page_title ?? '') == 'About Us' ? 'active' : ''; ?>">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/about.php">About Us</a>
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>about/">About Us</a>
                 </li>
                  <li class="nav-item <?php echo ($page_title ?? '') == 'Testimonials' ? 'active' : ''; ?>">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/testimonials.php">Testimonials</a>
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>testimonials/">Testimonials</a>
                 </li>
                 <li class="nav-item <?php echo ($page_title ?? '') == 'Blog' ? 'active' : ''; ?>">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/blog.php">Blog</a>
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>blog/">Blog</a>
                 </li>
                 <li class="nav-item <?php echo ($page_title ?? '') == 'Contact Us' ? 'active' : ''; ?>">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/contact.php">Contact</a>
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>contact/">Contact</a>
                 </li>
                 <!-- User Account & Cart - to be enhanced with session logic -->
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/login.php">Login</a>
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>login/">Login</a>
                 </li>
                  <li class="nav-item">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/register.php">Register</a>
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>register/">Register</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo SITE_URL; ?>/cart.php">
+                    <a class="nav-link" href="<?php echo SITE_URL; ?>cart/">
                         <i class="fas fa-shopping-cart"></i> Cart
                         <span class="badge badge-pill badge-primary" id="cart-count-badge">
                             <?php

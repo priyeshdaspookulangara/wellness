@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../includes/db.php'; // Adjusted path for db.php
 
 // Get search query
 $query = $_GET['q'] ?? '';
@@ -22,7 +22,7 @@ if (!empty($query)) {
     }
 }
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Adjusted path for header.php
 ?>
 
 <div class="row mb-3">
@@ -41,12 +41,12 @@ require_once 'templates/header.php';
         <?php foreach ($products as $product): ?>
             <div class="col-md-4 mb-4">
                 <div class="card">
-                     <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"> <!-- Assuming product.php uses slug -->
+                     <a href="<?php echo SITE_URL; ?>product/?slug=<?php echo htmlspecialchars($product['slug']); ?>">
                         <img src="<?php echo htmlspecialchars($product['image_url_main']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     </a>
                     <div class="card-body">
                         <h5 class="card-title">
-                            <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"><?php echo htmlspecialchars($product['name']); ?></a> <!-- Assuming product.php uses slug -->
+                            <a href="<?php echo SITE_URL; ?>product/?slug=<?php echo htmlspecialchars($product['slug']); ?>"><?php echo htmlspecialchars($product['name']); ?></a>
                         </h5>
                         <p class="card-text"><strong>$<?php echo htmlspecialchars($product['price']); ?></strong></p>
                         <div class="d-flex justify-content-between align-items-center">
@@ -54,7 +54,7 @@ require_once 'templates/header.php';
                             <?php
                             // Fetch total likes for this product
                             $total_likes_search = 0;
-                            if (isset($conn) && isset($product['id'])) {
+                            if (isset($conn) && isset($product['id'])) { // $conn should be available via db.php
                                 $sql_total_likes_search = "SELECT COUNT(id) as count FROM user_product_likes WHERE product_id = " . (int)$product['id'];
                                 $res_total_likes_search = mysqli_query($conn, $sql_total_likes_search);
                                 if ($res_total_likes_search) {
@@ -83,7 +83,7 @@ require_once 'templates/header.php';
 </div>
 
 <!-- Placeholder for a search form if not in header -->
-<form action="<?php echo SITE_URL; ?>/search.php" method="GET" class="mt-4">
+<form action="<?php echo SITE_URL; ?>search/" method="GET" class="mt-4"> <!-- Updated form action -->
     <div class="input-group mb-3">
         <input type="text" class="form-control" name="q" placeholder="Search for products..." value="<?php echo htmlspecialchars($query); ?>">
         <div class="input-group-append">
@@ -93,5 +93,5 @@ require_once 'templates/header.php';
 </form>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Adjusted path for footer.php
 ?>

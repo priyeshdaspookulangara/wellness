@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../config.php'; // Corrected
+require_once __DIR__ . '/../includes/db.php'; // Corrected
 
 $page_title = "Customer Testimonials";
 
@@ -35,7 +35,7 @@ if ($result_reviews) {
     // echo "Error fetching reviews: " . mysqli_error($conn);
 }
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Corrected
 ?>
 
 <div class="container py-5">
@@ -60,7 +60,7 @@ require_once 'templates/header.php';
                             <footer class="blockquote-footer">
                                 <?php echo htmlspecialchars($review['user_username']); ?>
                                 <?php if (!empty($review['product_name'])): ?>
-                                    regarding <cite title="<?php echo htmlspecialchars($review['product_name']); ?>"><a href="<?php echo SITE_URL . '/product/' . htmlspecialchars($review['product_slug']); ?>"><?php echo htmlspecialchars($review['product_name']); ?></a></cite>
+                                    regarding <cite title="<?php echo htmlspecialchars($review['product_name']); ?>"><a href="<?php echo SITE_URL . 'product/?slug=' . htmlspecialchars($review['product_slug']); ?>"><?php echo htmlspecialchars($review['product_name']); ?></a></cite> <!-- Updated link -->
                                 <?php endif; ?>
                             </footer>
                         </div>
@@ -79,5 +79,5 @@ require_once 'templates/header.php';
 </div>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Corrected
 ?>

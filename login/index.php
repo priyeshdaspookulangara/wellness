@@ -1,13 +1,14 @@
 <?php
 session_start(); // Start session to manage user login state and messages
-require_once __DIR__ . '/includes/db.php'; // For database connection and escape_string
+require_once __DIR__ . '/../config.php'; // Added for SITE_URL
+require_once __DIR__ . '/../includes/db.php'; // For database connection and escape_string
 
 $page_title = "User Login";
 $errors = [];
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header("Location: account.php");
+    header("Location: " . SITE_URL . "account/"); // Updated redirect
     exit;
 }
 
@@ -45,9 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Redirect to account page or admin dashboard if admin
                 if ($user['is_admin']) {
-                    header("Location: admin/index.php");
+                    header("Location: " . SITE_URL . "admin/index.php"); // Assuming admin is still admin/
                 } else {
-                    header("Location: account.php");
+                    header("Location: " . SITE_URL . "account/"); // Updated redirect
                 }
                 exit;
             } else {
@@ -88,7 +89,7 @@ require_once 'templates/header.php';
         <?php endif; ?>
 
 
-        <form action="login.php" method="POST">
+        <form action="<?php echo SITE_URL; ?>login/" method="POST"> <!-- Updated form action -->
             <div class="form-group">
                 <label for="email_or_username">Email or Username</label>
                 <input type="text" class="form-control" id="email_or_username" name="email_or_username" value="<?php echo htmlspecialchars($email_or_username ?? ''); ?>" required>
@@ -100,10 +101,10 @@ require_once 'templates/header.php';
             <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
         <p class="text-center mt-3">
-            <a href="forgot_password.php">Forgot Password?</a>
+            <a href="<?php echo SITE_URL; ?>forgot_password/">Forgot Password?</a> <!-- Updated link -->
         </p>
         <p class="text-center mt-2">
-            Don't have an account? <a href="register.php">Register here</a>
+            Don't have an account? <a href="<?php echo SITE_URL; ?>register/">Register here</a> <!-- Updated link -->
         </p>
     </div>
 </div>

@@ -8,7 +8,7 @@ require_once 'templates/header.php';
     <p class="lead">Your one-stop shop for premium wellness products designed to enhance your well-being.</p>
     <hr class="my-4">
     <p>Explore our range of magnetic therapy items, natural supplements, and more.</p>
-    <a class="btn btn-primary btn-lg" href="#" role="button">Shop Now</a>
+    <a class="btn btn-primary btn-lg" href="<?php echo SITE_URL; ?>category/?slug=all" role="button">Shop Now</a> <!-- Example: Link to a general category or products page -->
 </div>
 
 <section id="new-arrivals" class="my-5">

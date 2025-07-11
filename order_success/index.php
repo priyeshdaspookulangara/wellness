@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/includes/db.php'; // For potential future use, like fetching order details to display
+require_once __DIR__ . '/../config.php'; // Corrected
+require_once __DIR__ . '/../includes/db.php'; // Corrected
 
 $page_title = "Order Successful";
 
@@ -9,7 +9,7 @@ $order_id = (int)($_GET['order_id'] ?? 0);
 
 if (!$order_id) {
     // If no order ID, maybe redirect to homepage or account
-    header("Location: index.php");
+    header("Location: " . SITE_URL); // Redirect to homepage
     exit;
 }
 
@@ -28,7 +28,7 @@ if ($result_order && mysqli_num_rows($result_order) > 0) {
 }
 
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Corrected
 ?>
 
 <div class="container py-5 text-center">
@@ -49,14 +49,14 @@ require_once 'templates/header.php';
             <hr class="my-4">
 
             <p>
-                You can view your order details in your <a href="account.php">account dashboard</a> if you are registered,
+                You can view your order details in your <a href="<?php echo SITE_URL; ?>account/">account dashboard</a> if you are registered,
                 or keep your order ID (<?php echo htmlspecialchars($order_id); ?>) for reference.
             </p>
-            <a href="<?php echo SITE_URL; ?>/index.php" class="btn btn-primary btn-lg mt-3">Continue Shopping</a>
+            <a href="<?php echo SITE_URL; ?>" class="btn btn-primary btn-lg mt-3">Continue Shopping</a>
         </div>
     </div>
 </div>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Corrected
 ?>

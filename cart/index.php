@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/includes/db.php'; // For product details if needed, and escape_string
+require_once __DIR__ . '/../config.php'; // Adjusted path
+require_once __DIR__ . '/../includes/db.php'; // Adjusted path
 
 $page_title = "Shopping Cart";
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Adjusted path
 
 // Initialize cart if not already set
 if (!isset($_SESSION['cart'])) {
@@ -39,8 +39,6 @@ if (!empty($cart_items)) {
         }
     }
 }
-// For display, ensure items are shown in the order they were added or a consistent order
-// Re-order $cart_products_details based on $_SESSION['cart'] order if necessary, though current loop by product_ids from DB is usually fine.
 
 $shipping_cost = 5.00; // Example flat rate shipping
 $grand_total = $subtotal + $shipping_cost;
@@ -74,12 +72,12 @@ $grand_total = $subtotal + $shipping_cost;
                     <?php foreach ($cart_products_details as $item): ?>
                     <tr>
                         <td>
-                            <a href="<?php echo SITE_URL . '/product/' . htmlspecialchars($item['slug']); ?>">
-                                <img src="<?php echo SITE_URL . '/uploads/' . htmlspecialchars($item['image_url_main'] ?? 'default.png'); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="img-fluid" style="max-height: 75px;">
+                            <a href="<?php echo SITE_URL . 'product/?slug=' . htmlspecialchars($item['slug']); ?>"> <!-- Updated link -->
+                                <img src="<?php echo SITE_URL . 'uploads/' . htmlspecialchars($item['image_url_main'] ?? 'default.png'); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="img-fluid" style="max-height: 75px;">
                             </a>
                         </td>
                         <td>
-                            <a href="<?php echo SITE_URL . '/product/' . htmlspecialchars($item['slug']); ?>">
+                            <a href="<?php echo SITE_URL . 'product/?slug=' . htmlspecialchars($item['slug']); ?>"> <!-- Updated link -->
                                 <?php echo htmlspecialchars($item['name']); ?>
                             </a>
                             <?php if ($item['quantity_in_cart'] > $item['stock']): ?>
@@ -88,7 +86,7 @@ $grand_total = $subtotal + $shipping_cost;
                         </td>
                         <td>$<?php echo number_format($item['price'], 2); ?></td>
                         <td>
-                            <form action="cart_actions.php" method="POST" class="form-inline">
+                            <form action="<?php echo SITE_URL; ?>cart_actions.php" method="POST" class="form-inline"> <!-- cart_actions.php is in root -->
                                 <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="product_id" value="<?php echo $item['id']; ?>">
                                 <input type="number" name="quantity" value="<?php echo $item['quantity_in_cart']; ?>" min="1" max="<?php echo $item['stock']; ?>" class="form-control form-control-sm" style="width: 60px;">
@@ -97,7 +95,7 @@ $grand_total = $subtotal + $shipping_cost;
                         </td>
                         <td>$<?php echo number_format($item['line_total'], 2); ?></td>
                         <td>
-                            <form action="cart_actions.php" method="POST">
+                            <form action="<?php echo SITE_URL; ?>cart_actions.php" method="POST"> <!-- cart_actions.php is in root -->
                                 <input type="hidden" name="action" value="remove">
                                 <input type="hidden" name="product_id" value="<?php echo $item['id']; ?>">
                                 <button type="submit" class="btn btn-sm btn-danger" title="Remove Item"><i class="fas fa-trash"></i></button>
@@ -107,7 +105,7 @@ $grand_total = $subtotal + $shipping_cost;
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <a href="<?php echo SITE_URL; ?>/index.php" class="btn btn-outline-secondary"><i class="fas fa-shopping-bag"></i> Continue Shopping</a>
+            <a href="<?php echo SITE_URL; ?>" class="btn btn-outline-secondary"><i class="fas fa-shopping-bag"></i> Continue Shopping</a> <!-- Updated link to homepage -->
         </div>
         <div class="col-md-4">
             <div class="card">
@@ -127,17 +125,17 @@ $grand_total = $subtotal + $shipping_cost;
                             <span>$<?php echo number_format($grand_total, 2); ?></span>
                         </li>
                     </ul>
-                    <a href="checkout.php" class="btn btn-primary btn-block mt-3 <?php echo $total_items == 0 ? 'disabled' : ''; ?>">Proceed to Checkout</a>
+                    <a href="<?php echo SITE_URL; ?>checkout/" class="btn btn-primary btn-block mt-3 <?php echo $total_items == 0 ? 'disabled' : ''; ?>">Proceed to Checkout</a> <!-- Updated link -->
                 </div>
             </div>
         </div>
     </div>
 <?php else: ?>
     <div class="alert alert-info">
-        Your shopping cart is empty. <a href="<?php echo SITE_URL; ?>/index.php">Start shopping now!</a>
+        Your shopping cart is empty. <a href="<?php echo SITE_URL; ?>">Start shopping now!</a> <!-- Updated link to homepage -->
     </div>
 <?php endif; ?>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Adjusted path
 ?>

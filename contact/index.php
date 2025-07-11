@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php'; // For SITE_URL, ADMIN_EMAIL
-require_once __DIR__ . '/includes/db.php'; // For escape_string if saving to DB
+require_once __DIR__ . '/../config.php'; // Corrected
+require_once __DIR__ . '/../includes/db.php'; // Corrected
 
 $page_title = "Contact Us";
 
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Corrected
 ?>
 
 <div class="container py-5">
@@ -92,7 +92,7 @@ require_once 'templates/header.php';
 
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="contact.php" method="POST">
+                    <form action="<?php echo SITE_URL; ?>contact/" method="POST"> <!-- Updated form action -->
                         <div class="form-group">
                             <label for="name">Your Name</label>
                             <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($form_data['name']); ?>" required>
@@ -136,5 +136,5 @@ require_once 'templates/header.php';
 </div>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Corrected
 ?>

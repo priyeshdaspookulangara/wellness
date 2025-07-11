@@ -46,7 +46,7 @@ require_once 'templates/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="forgot_password.php" method="POST">
+        <form action="<?php echo SITE_URL; ?>forgot_password/" method="POST"> <!-- Updated form action -->
             <div class="form-group">
                 <label for="email">Enter your Email Address</label>
                 <input type="email" class="form-control" id="email" name="email" required>
@@ -54,7 +54,7 @@ require_once 'templates/header.php';
             <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
         </form>
         <p class="text-center mt-3">
-            Remembered your password? <a href="login.php">Login here</a>
+            Remembered your password? <a href="<?php echo SITE_URL; ?>login/">Login here</a> <!-- Updated link -->
         </p>
     </div>
 </div>

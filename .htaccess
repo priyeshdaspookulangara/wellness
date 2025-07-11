@@ -1,13 +1,16 @@
 # Apache Server Configs
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # RewriteBase /wellness-platform/ # Adjust if your project is in a subdirectory.
-                                     # Not strictly necessary if not using complex relative rewrites without clean URLs.
+    # No RewriteRules are currently used for the directory-based URL structure.
+    # Apache's DirectoryIndex directive (usually defaulting to index.php) handles this.
+    # RewriteBase /wellness-platform/ # This would be relevant if using relative RewriteRules.
 </IfModule>
 
 # Custom Error Pages
-ErrorDocument 404 /wellness-platform/404.php # Adjust path if RewriteBase is changed or project is in root.
-                                           # Or use an absolute path from web root: /404.php if in root.
+# This path is relative to the DocumentRoot.
+# If your site is http://localhost/wellness-platform/, this path is correct.
+# If your site is http://localhost/, this path would be /404.php.
+ErrorDocument 404 /wellness-platform/404.php
 
 # Disable directory browsing
 Options -Indexes
@@ -15,10 +18,10 @@ Options -Indexes
 # Set default charset
 AddDefaultCharset UTF-8
 
-# Basic security headers (optional but recommended)
+# Basic security headers
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
-    # Header set Content-Security-Policy "default-src 'self';"
+    # Header set Content-Security-Policy "default-src 'self';" # Requires careful configuration
 </IfModule>

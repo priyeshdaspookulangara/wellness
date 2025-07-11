@@ -1,7 +1,7 @@
 <?php
 session_start(); // Not strictly necessary for this page unless using session messages
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../config.php'; // Corrected
+require_once __DIR__ . '/../includes/db.php'; // Corrected
 
 $page_title = "About Us";
 
@@ -17,7 +17,7 @@ if ($result_about && mysqli_num_rows($result_about) > 0) {
     $about_us_content = "<p>Welcome to " . SITE_NAME . "! We are passionate about wellness and dedicated to providing high-quality products to support your journey to a healthier life. Our mission is to build trust through education and transparency, offering items that deliver real benefits.</p><p>Learn more about our philosophy and commitment soon!</p>";
 }
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Corrected
 ?>
 
 <div class="container py-5">
@@ -59,5 +59,5 @@ require_once 'templates/header.php';
 </div>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Corrected
 ?>

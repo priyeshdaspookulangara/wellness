@@ -1,6 +1,7 @@
 <?php
 session_start(); // Start session to manage user login state and messages
-require_once __DIR__ . '/includes/db.php'; // For database connection and escape_string
+require_once __DIR__ . '/../config.php'; // Added for SITE_URL
+require_once __DIR__ . '/../includes/db.php'; // For database connection and escape_string
 
 $page_title = "User Registration";
 $errors = [];
@@ -8,7 +9,7 @@ $success_message = '';
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header("Location: account.php");
+    header("Location: " . SITE_URL . "account/"); // Updated redirect
     exit;
 }
 
@@ -103,10 +104,10 @@ require_once 'templates/header.php';
         <?php if ($success_message): ?>
             <div class="alert alert-success">
                 <?php echo $success_message; ?>
-                <p><a href="login.php">Click here to Login</a></p>
+                <p><a href="<?php echo SITE_URL; ?>login/">Click here to Login</a></p> <!-- Updated link -->
             </div>
         <?php else: // Hide form if registration is successful ?>
-            <form action="register.php" method="POST">
+            <form action="<?php echo SITE_URL; ?>register/" method="POST"> <!-- Updated form action -->
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($username ?? ''); ?>" required>
@@ -126,7 +127,7 @@ require_once 'templates/header.php';
                 <button type="submit" class="btn btn-primary btn-block">Register</button>
             </form>
             <p class="text-center mt-3">
-                Already have an account? <a href="login.php">Login here</a>
+                Already have an account? <a href="<?php echo SITE_URL; ?>login/">Login here</a> <!-- Updated link -->
             </p>
         <?php endif; ?>
     </div>

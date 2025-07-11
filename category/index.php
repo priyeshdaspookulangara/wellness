@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/includes/db.php'; // For escape_string and potentially db connection if not included by header
+session_start(); // Added: Should be at the top if using sessions for like buttons etc.
+require_once __DIR__ . '/../config.php';     // Corrected
+require_once __DIR__ . '/../includes/db.php'; // Corrected
 
 // Get category slug from URL
 $category_slug = $_GET['slug'] ?? null;
@@ -27,7 +29,7 @@ if ($category_slug) {
 }
 
 $page_title = $category_name;
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Corrected
 ?>
 
 <div class="row mb-3">
@@ -67,12 +69,12 @@ require_once 'templates/header.php';
                 <?php foreach ($products as $product): ?>
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"> <!-- Assuming product.php uses slug -->
+                            <a href="<?php echo SITE_URL; ?>product/?slug=<?php echo htmlspecialchars($product['slug']); ?>">
                                 <img src="<?php echo htmlspecialchars($product['image_url_main']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>">
                             </a>
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="<?php echo SITE_URL . '/product.php?slug=' . htmlspecialchars($product['slug']); ?>"><?php echo htmlspecialchars($product['name']); ?></a> <!-- Assuming product.php uses slug -->
+                                    <a href="<?php echo SITE_URL; ?>product/?slug=<?php echo htmlspecialchars($product['slug']); ?>"><?php echo htmlspecialchars($product['name']); ?></a>
                                 </h5>
                                 <p class="card-text"><strong>$<?php echo htmlspecialchars($product['price']); ?></strong></p>
                                 <div class="d-flex justify-content-between align-items-center">
@@ -121,5 +123,5 @@ require_once 'templates/header.php';
 </div>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Corrected
 ?>

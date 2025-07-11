@@ -1,11 +1,12 @@
 <?php
 session_start();
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/../includes/db.php'; // Adjusted path
+require_once __DIR__ . '/../config.php'; // For SITE_URL if needed for redirects or links back
 
 $page_title = "Edit Profile";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: " . SITE_URL . "login/"); // Updated redirect
     exit;
 }
 
@@ -14,7 +15,7 @@ $user_id = $_SESSION['user_id'];
 // $sql = "SELECT first_name, last_name, email, address_street, address_city, ... FROM users WHERE id = '$user_id'";
 // ... fetch user data ...
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Adjusted path
 ?>
 
 <h1><?php echo $page_title; ?></h1>

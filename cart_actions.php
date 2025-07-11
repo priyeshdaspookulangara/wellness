@@ -21,7 +21,7 @@ if (!$product_id || $product_id <= 0) {
         echo json_encode($response);
         exit;
     }
-    header("Location: " . ($_SERVER['HTTP_REFERER'] ?? 'cart.php'));
+    header("Location: " . ($_SERVER['HTTP_REFERER'] ?? SITE_URL . 'cart/')); // Updated default redirect
     exit;
 }
 
@@ -40,7 +40,7 @@ if ($res_stock && mysqli_num_rows($res_stock) > 0) {
         echo json_encode($response);
         exit;
     }
-    header("Location: " . ($_SERVER['HTTP_REFERER'] ?? 'cart.php'));
+    header("Location: " . ($_SERVER['HTTP_REFERER'] ?? SITE_URL . 'cart/')); // Updated default redirect
     exit;
 }
 
@@ -133,7 +133,7 @@ if (isset($_POST['is_ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && str
     exit;
 } else {
     // Redirect back to the cart page or the page the user came from
-    header("Location: " . ($_SERVER['HTTP_REFERER'] ?? 'cart.php'));
+    header("Location: " . ($_SERVER['HTTP_REFERER'] ?? SITE_URL . 'cart/')); // Updated default redirect
     exit;
 }
 ?>

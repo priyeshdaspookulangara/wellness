@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/includes/db.php';
+session_start(); // Added: Should be at the top if using sessions for likes etc.
+require_once __DIR__ . '/../config.php';     // Corrected
+require_once __DIR__ . '/../includes/db.php'; // Corrected
 
 // Get product slug from URL
 $product_slug = $_GET['slug'] ?? null;
@@ -57,20 +59,20 @@ if ($product_slug) {
 if (!$product) {
     // Optional: Redirect to 404 page or show an error
     $page_title = "Product Not Found";
-    require_once 'templates/header.php';
+    require_once __DIR__ . '/../templates/header.php'; // Corrected
     echo "<p>The product you are looking for was not found.</p>";
-    require_once 'templates/footer.php';
+    require_once __DIR__ . '/../templates/footer.php'; // Corrected
     exit;
 }
 
 $page_title = htmlspecialchars($product['name']);
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/header.php'; // Corrected
 ?>
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/index.php">Home</a></li>
-    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>/category.php?slug=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars($product['category_name']); ?></a></li> <!-- Assuming category.php uses slug -->
+    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>">Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo SITE_URL; ?>category/?slug=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars($product['category_name']); ?></a></li>
     <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($product['name']); ?></li>
   </ol>
 </nav>
@@ -196,7 +198,7 @@ require_once 'templates/header.php';
         <?php endif; ?>
 
         <div class="mt-3">
-             <p><strong>Category:</strong> <a href="<?php echo SITE_URL; ?>/category.php?slug=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars($product['category_name']); ?></a></p>
+             <p><strong>Category:</strong> <a href="<?php echo SITE_URL; ?>category/?slug=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars($product['category_name']); ?></a></p>
         </div>
          <div class="mt-3">
             <p class="text-muted"><small>Disclaimer: This product is not intended to diagnose, treat, cure, or prevent any disease. Consult with a healthcare professional for any health concerns.</small></p>
@@ -256,7 +258,7 @@ require_once 'templates/header.php';
                     if ($user_has_reviewed): ?>
                         <div class="alert alert-info">You have already submitted a review for this product.</div>
                     <?php elseif ($user_has_purchased || (isset($product['id']) && $product['id'] == 101 ) /* temp allow review for specific product for demo */ ): // Loosen for demo if needed, or remove demo part ?>
-                        <form action="submit_review.php" method="POST">
+                        <form action="<?php echo SITE_URL; ?>submit_review.php" method="POST"> <!-- submit_review.php is in root -->
                             <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product['id']); ?>">
                             <input type="hidden" name="product_slug" value="<?php echo htmlspecialchars($product['slug']); ?>"> <!-- For redirect -->
                             <div class="form-group">
@@ -282,7 +284,7 @@ require_once 'templates/header.php';
                         </div>
                     <?php endif; ?>
                 <?php else: ?>
-                    <p>Please <a href="<?php echo SITE_URL; ?>/login.php?redirect=<?php echo urlencode(SITE_URL . '/product/' . $product['slug']); ?>">login</a> to leave a review.</p>
+                    <p>Please <a href="<?php echo SITE_URL; ?>login/?redirect=<?php echo urlencode(SITE_URL . 'product/?slug=' . $product['slug']); ?>">login</a> to leave a review.</p>
                 <?php endif; ?>
 
                 <?php if(isset($_SESSION['review_message'])): ?>
@@ -327,5 +329,5 @@ require_once 'templates/header.php';
 </div>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/footer.php'; // Corrected
 ?>

@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rating = (int)($_POST['rating'] ?? 0);
     $comment = trim($_POST['comment'] ?? '');
 
-    $redirect_url = !empty($product_slug) ? SITE_URL . '/product/' . $product_slug : SITE_URL . '/index.php';
+    $redirect_url = !empty($product_slug) ? SITE_URL . 'product/?slug=' . $product_slug : SITE_URL; // Updated redirect base
 
     // Validation
     if (!$product_id) {
@@ -30,19 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($rating < 1 || $rating > 5) {
         $_SESSION['review_message'] = "Please select a valid rating (1-5 stars).";
         $_SESSION['review_message_type'] = "danger";
-        header("Location: " . $redirect_url . "#review-form"); // Link to form
+        header("Location: " . $redirect_url . (strpos($redirect_url, '?') === false ? '?' : '&') . "#review-form"); // Link to form, careful with query params
         exit;
     }
     if (empty($comment)) {
         $_SESSION['review_message'] = "Please enter your review comment.";
         $_SESSION['review_message_type'] = "danger";
-        header("Location: " . $redirect_url . "#review-form");
+        header("Location: " . $redirect_url . (strpos($redirect_url, '?') === false ? '?' : '&') . "#review-form");
         exit;
     }
     if (strlen($comment) > 2000) { // Max comment length
         $_SESSION['review_message'] = "Your review comment is too long (max 2000 characters).";
         $_SESSION['review_message_type'] = "danger";
-        header("Location: " . $redirect_url . "#review-form");
+        header("Location: " . $redirect_url . (strpos($redirect_url, '?') === false ? '?' : '&') . "#review-form");
         exit;
     }
 
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($res_check_existing && mysqli_num_rows($res_check_existing) > 0) {
         $_SESSION['review_message'] = "You have already submitted a review for this product.";
         $_SESSION['review_message_type'] = "info";
-        header("Location: " . $redirect_url);
+        header("Location: " . $redirect_url); // This redirect is fine as $redirect_url is already updated
         exit;
     }
 
@@ -88,12 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['review_message_type'] = "danger";
     }
 
-    header("Location: " . $redirect_url . (strpos($redirect_url, '#') === false ? '#customer-reviews' : '')); // Redirect to reviews section
+    header("Location: " . $redirect_url . (strpos($redirect_url, '?') === false && strpos($redirect_url, '#') === false ? '' : (strpos($redirect_url, '#') !== false ? '' : (strpos($redirect_url, '?') !== false ? '&' : '?'))) . "#customer-reviews"); // Append # to existing query or path
     exit;
 
 } else {
     // Not a POST request, redirect away
-    header("Location: " . SITE_URL . "/index.php");
+    header("Location: " . SITE_URL); // Redirect to homepage
     exit;
 }
 ?>

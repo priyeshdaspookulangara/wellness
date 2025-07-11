@@ -6,7 +6,7 @@ define('DB_PASS', 'your_db_password'); // Replace with your database password
 define('DB_NAME', 'wellness_ecommerce'); // Replace with your database name
 
 // Site Configuration
-define('SITE_URL', 'http://localhost/wellness-platform'); // Replace with your site URL
+define('SITE_URL', 'http://localhost/wellness-platform/'); // Replace with your site URL - ensure trailing slash
 define('SITE_NAME', 'Wellness Wonders');
 define('ADMIN_EMAIL', 'admin@example.com');
 
