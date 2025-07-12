@@ -1,5 +1,6 @@
 <?php
 session_start(); // Access the existing session.
+require_once __DIR__ . '/config.php'; // For SITE_URL in redirect
 
 // Unset all of the session variables.
 $_SESSION = array();
@@ -18,6 +19,6 @@ if (ini_get("session.use_cookies")) {
 session_destroy();
 
 // Redirect to login page with a logged_out message
-header("Location: " . SITE_URL . "login/?logged_out=true"); // Updated redirect
+header("Location: " . SITE_URL . "login/?logged_out=true");
 exit;
 ?>

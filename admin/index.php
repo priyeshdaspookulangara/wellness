@@ -1,18 +1,18 @@
 <?php
 session_start();
-require_once __DIR__ . '/../config.php'; // For SITE_URL, etc.
-require_once __DIR__ . '/../includes/db.php'; // For db connection if needed directly
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/db.php';
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-    // If not admin or not logged in, redirect to main site login page or a specific admin login
     $_SESSION['admin_error'] = "You do not have permission to access the admin panel.";
-    header("Location: " . SITE_URL . "/login.php"); // Or create admin/login.php and redirect there
+    header("Location: " . SITE_URL . "login/"); // Corrected redirect
     exit;
 }
 
 $page_title = "Admin Dashboard";
-require_once 'includes/header.php'; // Admin specific header
+// For admin pages, includes are relative to the admin directory's root (where this index.php is)
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -92,5 +92,5 @@ require_once 'includes/header.php'; // Admin specific header
 <!-- Further dashboard elements will go here -->
 
 <?php
-require_once 'includes/footer.php'; // Admin specific footer
+require_once __DIR__ . '/includes/footer.php';
 ?>

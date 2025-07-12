@@ -1,6 +1,8 @@
 <?php
-$page_title = "Homepage";
-require_once 'templates/header.php';
+session_start(); // Required for user-specific content like cart count in header
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/db.php'; // If fetching dynamic products for homepage
+require_once __DIR__ . '/templates/header.php';
 ?>
 
 <div class="jumbotron">
@@ -8,7 +10,7 @@ require_once 'templates/header.php';
     <p class="lead">Your one-stop shop for premium wellness products designed to enhance your well-being.</p>
     <hr class="my-4">
     <p>Explore our range of magnetic therapy items, natural supplements, and more.</p>
-    <a class="btn btn-primary btn-lg" href="<?php echo SITE_URL; ?>category/?slug=all" role="button">Shop Now</a> <!-- Example: Link to a general category or products page -->
+    <a class="btn btn-primary btn-lg" href="<?php echo SITE_URL; ?>category/?slug=all" role="button">Shop Now</a>
 </div>
 
 <section id="new-arrivals" class="my-5">
@@ -17,21 +19,21 @@ require_once 'templates/header.php';
         <!-- Placeholder for new arrival products -->
         <div class="col-md-4">
             <div class="card mb-4">
-                <a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-1-slug"> <!-- Example Link -->
+                <a href="<?php echo SITE_URL; ?>product/?slug=new-product-1-slug">
                     <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="New Product 1">
                 </a>
                 <div class="card-body">
-                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-1-slug">New Product 1</a></h5>
+                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>product/?slug=new-product-1-slug">New Product 1</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$19.99</strong></p>
                     <div class="d-flex justify-content-between align-items-center">
-                         <button class="btn btn-primary add-to-cart-btn" data-product-id="1"> <!-- Placeholder ID -->
+                         <button class="btn btn-primary add-to-cart-btn" data-product-id="1">
                             <i class="fas fa-shopping-cart"></i> Cart
                          </button>
                          <button class="btn btn-sm btn-outline-danger like-product-btn"
                                 data-product-id="1" data-action="like" title="Like Product"
                                 <?php echo !isset($_SESSION['user_id']) ? 'disabled' : ''; ?>>
-                            <i class="fas fa-heart"></i> (<span class="like-count">0</span>) <!-- Placeholder count -->
+                            <i class="fas fa-heart"></i> (<span class="like-count">0</span>)
                          </button>
                     </div>
                 </div>
@@ -39,15 +41,15 @@ require_once 'templates/header.php';
         </div>
         <div class="col-md-4">
             <div class="card mb-4">
-                <a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-2-slug"> <!-- Example Link -->
+                <a href="<?php echo SITE_URL; ?>product/?slug=new-product-2-slug">
                     <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="New Product 2">
                 </a>
                 <div class="card-body">
-                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-2-slug">New Product 2</a></h5>
+                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>product/?slug=new-product-2-slug">New Product 2</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$29.99</strong></p>
                      <div class="d-flex justify-content-between align-items-center">
-                         <button class="btn btn-primary add-to-cart-btn" data-product-id="2"> <!-- Placeholder ID -->
+                         <button class="btn btn-primary add-to-cart-btn" data-product-id="2">
                             <i class="fas fa-shopping-cart"></i> Cart
                          </button>
                          <button class="btn btn-sm btn-outline-danger like-product-btn"
@@ -61,15 +63,15 @@ require_once 'templates/header.php';
         </div>
         <div class="col-md-4">
             <div class="card mb-4">
-                 <a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-3-slug"> <!-- Example Link -->
+                 <a href="<?php echo SITE_URL; ?>product/?slug=new-product-3-slug">
                     <img src="https://via.placeholder.com/300x200.png?text=Product+Image" class="card-img-top" alt="New Product 3">
                 </a>
                 <div class="card-body">
-                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>/product.php?slug=new-product-3-slug">New Product 3</a></h5>
+                    <h5 class="card-title"><a href="<?php echo SITE_URL; ?>product/?slug=new-product-3-slug">New Product 3</a></h5>
                     <p class="card-text">Brief description of the new product.</p>
                     <p class="card-text"><strong>$39.99</strong></p>
                      <div class="d-flex justify-content-between align-items-center">
-                         <button class="btn btn-primary add-to-cart-btn" data-product-id="3"> <!-- Placeholder ID -->
+                         <button class="btn btn-primary add-to-cart-btn" data-product-id="3">
                             <i class="fas fa-shopping-cart"></i> Cart
                          </button>
                          <button class="btn btn-sm btn-outline-danger like-product-btn"
@@ -91,23 +93,27 @@ require_once 'templates/header.php';
             <!-- Placeholder for bestseller products -->
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <img src="https://via.placeholder.com/300x200.png?text=Bestseller+1" class="card-img-top" alt="Bestseller Product 1">
+                    <a href="<?php echo SITE_URL; ?>product/?slug=bestseller-1-slug">
+                        <img src="https://via.placeholder.com/300x200.png?text=Bestseller+1" class="card-img-top" alt="Bestseller Product 1">
+                    </a>
                     <div class="card-body">
-                        <h5 class="card-title">Bestseller 1</h5>
+                        <h5 class="card-title"><a href="<?php echo SITE_URL; ?>product/?slug=bestseller-1-slug">Bestseller 1</a></h5>
                         <p class="card-text">Description of bestseller product.</p>
                         <p class="card-text"><strong>$49.99</strong></p>
-                        <a href="#" class="btn btn-primary">View Details</a>
+                        <!-- Add to cart/like buttons if desired -->
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <img src="https://via.placeholder.com/300x200.png?text=Bestseller+2" class="card-img-top" alt="Bestseller Product 2">
+                     <a href="<?php echo SITE_URL; ?>product/?slug=bestseller-2-slug">
+                        <img src="https://via.placeholder.com/300x200.png?text=Bestseller+2" class="card-img-top" alt="Bestseller Product 2">
+                    </a>
                     <div class="card-body">
-                        <h5 class="card-title">Bestseller 2</h5>
+                        <h5 class="card-title"><a href="<?php echo SITE_URL; ?>product/?slug=bestseller-2-slug">Bestseller 2</a></h5>
                         <p class="card-text">Description of bestseller product.</p>
                         <p class="card-text"><strong>$59.99</strong></p>
-                        <a href="#" class="btn btn-primary">View Details</a>
+                        <!-- Add to cart/like buttons if desired -->
                     </div>
                 </div>
             </div>
@@ -138,5 +144,5 @@ require_once 'templates/header.php';
 </section>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/templates/footer.php';
 ?>
