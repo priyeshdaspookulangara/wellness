@@ -1,0 +1,211 @@
+/*
+ * Wellness Wonders - Admin Panel Stylesheet
+ */
+
+:root {
+    /* Color Palette */
+    --primary-color: #0d6efd;       /* Bootstrap Primary */
+    --secondary-color: #6c757d;     /* Bootstrap Secondary */
+    --success-color: #198754;       /* Bootstrap Success */
+    --danger-color: #dc3545;        /* Bootstrap Danger */
+    --warning-color: #ffc107;       /* Bootstrap Warning */
+    --info-color: #0dcaf0;          /* Bootstrap Info */
+    --light-color: #f8f9fa;
+    --dark-color: #212529;          /* Bootstrap Dark */
+    --white-color: #ffffff;
+    --black-color: #000000;
+
+    /* Text Colors */
+    --text-color: var(--dark-color);
+    --text-muted-color: var(--secondary-color);
+    --link-color: var(--primary-color);
+    --link-hover-color: #0a58ca;    /* Darker primary */
+
+    /* Layout Backgrounds */
+    --body-bg: #f4f6f9;             /* Light grey background */
+    --header-bg: var(--white-color);
+    --breadcrumb-bg: var(--white-color);
+    --card-bg: var(--white-color);
+    --card-header-bg: #f8f9fa;      /* Slightly off-white */
+
+    /* Sidebar Variables */
+    --sidebar-width: 250px;
+    --sidebar-bg: #343a40;          /* Dark sidebar */
+    --sidebar-text-color: rgba(255, 255, 255, 0.8);
+    --sidebar-link-active-bg: var(--primary-color);
+    --sidebar-link-active-color: var(--white-color);
+    --sidebar-link-hover-bg: #495057;
+    --sidebar-link-hover-color: var(--white-color);
+    --sidebar-border-color: #4b545c;
+
+    /* Font Variables */
+    --font-family-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    --font-size-base: 1rem;         /* 16px */
+    --font-size-sm: .875rem;
+    --font-size-lg: 1.125rem;
+
+    /* Border & Shadow */
+    --border-color: #dee2e6;
+    --box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    --box-shadow-sm: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+}
+
+body {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#admin-wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+/* --- Sidebar Styles --- */
+#sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text-color);
+    transition: margin-left 0.3s ease-in-out;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1031; /* Above navbar-z-index of 1030 */
+    overflow-y: auto;
+}
+
+#sidebar.collapsed {
+    margin-left: calc(-1 * var(--sidebar-width));
+}
+
+#sidebar .sidebar-header {
+    padding: 1.25rem 1.5rem;
+    background: rgba(0,0,0,0.1);
+    border-bottom: 1px solid var(--sidebar-border-color);
+    text-align: center;
+}
+#sidebar .sidebar-header h3 a {
+    color: var(--white-color);
+    font-size: 1.25rem;
+    margin-bottom: 0;
+    text-decoration: none;
+}
+
+#sidebar ul.components {
+    padding: 0;
+    list-style: none;
+}
+#sidebar ul li.nav-item {
+    border-bottom: 1px solid var(--sidebar-border-color);
+}
+#sidebar ul li a.nav-link {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    display: block;
+    color: var(--sidebar-text-color);
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+#sidebar ul li a.nav-link:hover {
+    color: var(--sidebar-link-hover-color);
+    background: var(--sidebar-link-hover-bg);
+    border-left-color: var(--primary-color);
+}
+#sidebar ul li.active > a.nav-link,
+#sidebar ul li a.nav-link[aria-expanded="true"] {
+    color: var(--sidebar-link-active-color);
+    background: var(--sidebar-link-active-bg);
+}
+#sidebar ul li a.nav-link .fas {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+#sidebar ul ul a.nav-link { /* Submenu items */
+    font-size: 0.9rem;
+    padding-left: 45px;
+    background: rgba(0,0,0,0.15);
+}
+ #sidebar ul ul a.nav-link:hover {
+    background: rgba(0,0,0,0.25);
+}
+#sidebar ul ul a.nav-link.active {
+    background: var(--primary-color);
+    color: var(--white-color);
+}
+#sidebar .dropdown-toggle::after {
+    margin-left: auto;
+}
+#sidebar .sidebar-divider {
+    margin: 1rem 0;
+    border-top: 1px solid var(--sidebar-border-color);
+}
+
+
+/* --- Content Area Styles --- */
+#content-wrapper {
+    width: 100%;
+    padding-left: var(--sidebar-width);
+    transition: padding-left 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+#sidebar.collapsed + #content-wrapper {
+    padding-left: 0;
+}
+
+.top-navbar {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    color: var(--header-text-color);
+    box-shadow: var(--box-shadow-sm);
+    min-height: 58px; /* Standard navbar height */
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-bar {
+    padding: var(--breadcrumb-padding);
+    background-color: var(--breadcrumb-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+.breadcrumb {
+    margin-bottom: 0;
+}
+.breadcrumb-item a {
+    color: var(--breadcrumb-link-color);
+    text-decoration: none;
+}
+.breadcrumb-item.active {
+    color: var(--breadcrumb-active-color);
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: var(--main-content-padding);
+    overflow-y: auto;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    #sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    #sidebar.active { /* 'active' class toggled by JS for mobile view */
+        margin-left: 0;
+    }
+    #content-wrapper {
+        padding-left: 0;
+    }
+}
