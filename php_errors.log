@@ -1,0 +1,10 @@
+[15-Jul-2025 01:41:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function db_connect() in /app/database/migrations/create_user_activity_log_table.php:7
+Stack trace:
+#0 /app/database/migrations/create_user_activity_log_table.php(45): up()
+#1 {main}
+  thrown in /app/database/migrations/create_user_activity_log_table.php on line 7
+[15-Jul-2025 01:41:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function db_connect() in /app/database/migrations/create_search_terms_analytics_table.php:7
+Stack trace:
+#0 /app/database/migrations/create_search_terms_analytics_table.php(32): up()
+#1 {main}
+  thrown in /app/database/migrations/create_search_terms_analytics_table.php on line 7
