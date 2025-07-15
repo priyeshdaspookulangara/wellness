@@ -8,3 +8,8 @@ Stack trace:
 #0 /app/database/migrations/create_search_terms_analytics_table.php(32): up()
 #1 {main}
   thrown in /app/database/migrations/create_search_terms_analytics_table.php on line 7
+[15-Jul-2025 01:51:33 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function db_connect() in /app/database/migrations/create_landing_pages_table.php:7
+Stack trace:
+#0 /app/database/migrations/create_landing_pages_table.php(41): up()
+#1 {main}
+  thrown in /app/database/migrations/create_landing_pages_table.php on line 7
