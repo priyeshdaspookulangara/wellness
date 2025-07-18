@@ -2,39 +2,43 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../templates/header.php';
+
+$pageTitle = 'About Us';
 ?>
 
 <div class="row">
     <div class="col-12">
-        <h1>About Us</h1>
-        <p>Welcome to <?php echo SITE_NAME; ?>, your trusted source for high-quality wellness products. We are dedicated to providing you with the best products to support your journey towards a healthier and more balanced lifestyle.</p>
-
-        <h2>Our Mission</h2>
-        <p>Our mission is to empower individuals to take control of their health and well-being by offering a curated selection of products that are safe, effective, and backed by science. We believe in the power of nature and technology to enhance our lives, and we are committed to bringing you innovative solutions that make a real difference.</p>
-
-        <h2>Our Story</h2>
-        <p>Founded in [Year], <?php echo SITE_NAME; ?> started with a simple idea: to make wellness accessible to everyone. Our founders, a team of health enthusiasts and experts, were passionate about finding natural and effective ways to improve their own health. They discovered the incredible benefits of magnetic therapy, natural supplements, and other wellness products, and they wanted to share these discoveries with the world.</p>
-        <p>From our humble beginnings, we have grown into a thriving online store, serving thousands of customers worldwide. We are proud of the community we have built and the positive impact we have had on people's lives.</p>
-
-        <h2>Our Commitment to Quality</h2>
-        <p>We understand that when it comes to your health, only the best will do. That's why we are committed to sourcing the highest quality products from reputable manufacturers. Every product we offer is carefully selected and rigorously tested to ensure it meets our strict standards of quality, safety, and efficacy.</p>
-
-        <h2>Why Choose Us?</h2>
-        <ul>
-            <li><strong>Premium Quality:</strong> We offer only the best products that we trust and use ourselves.</li>
-            <li><strong>Expert Knowledge:</strong> Our team has the expertise to help you find the right products for your needs.</li>
-            <li><strong>Customer-Centric:</strong> Your satisfaction is our top priority. We are always here to help with any questions or concerns.</li>
-            <li><strong>Educational Resources:</strong> We believe in empowering our customers with knowledge. Our blog and resources are here to help you learn more about wellness.</li>
-        </ul>
-
-        <h2>Meet the Team</h2>
-        <p>We are a small but dedicated team of professionals who are passionate about health and wellness. We are here to support you on your wellness journey.</p>
-        <!-- Optional: Add team member profiles here -->
-
-        <h2>Contact Us</h2>
-        <p>We love to hear from our customers! If you have any questions, feedback, or just want to say hello, please don't hesitate to <a href="<?php echo SITE_URL; ?>/contact">contact us</a>.</p>
+        <h1>About <?php echo SITE_NAME; ?></h1>
+        <p class="lead">Learn more about our mission, our values, and the team dedicated to enhancing your well-being.</p>
     </div>
 </div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h2>Our Mission</h2>
+        <p>At <?php echo SITE_NAME; ?>, our mission is to provide high-quality, effective wellness products that empower individuals to live healthier, more balanced lives. We believe in the power of natural and therapeutic solutions to improve physical and mental well-being. We are committed to sourcing the best materials, ensuring product excellence, and providing our customers with the education and support they need on their wellness journey.</p>
+
+        <h2>Our Values</h2>
+        <ul>
+            <li><strong>Quality:</strong> We never compromise on the quality of our products. Every item is carefully selected and tested to meet our high standards.</li>
+            <li><strong>Integrity:</strong> We operate with transparency and honesty in all our interactions with customers, partners, and the community.</li>
+            <li><strong>Education:</strong> We strive to be a trusted source of information, helping our customers make informed decisions about their health.</li>
+            <li><strong>Customer Focus:</strong> Your satisfaction and well-being are at the core of everything we do. We are here to support you.</li>
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <img src="https://via.placeholder.com/500x350.png?text=Our+Team" class="img-fluid rounded" alt="A placeholder image representing the Wellness Wonders team">
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h2>Meet the Team</h2>
+        <p>We are a small, passionate team of wellness advocates, product experts, and customer service professionals. While we may not show our faces here, we are united by a shared dedication to our mission and to you, our valued customer.</p>
+        <!-- In a real site, you might have team member bios here -->
+    </div>
+</div>
+
 
 <?php
 require_once __DIR__ . '/../templates/footer.php';
