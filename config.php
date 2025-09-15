@@ -31,4 +31,12 @@ ini_set('error_log', __DIR__ . '/php_errors.log');
 
 // Base path for includes (useful for file system includes)
 define('BASE_PATH', __DIR__ . '/');
+
+// SMTP Configuration for PHPMailer
+define('SMTP_HOST', 'smtp.example.com');
+define('SMTP_USER', 'user@example.com');
+define('SMTP_PASS', 'secret');
+define('SMTP_PORT', 587);
+define('SMTP_FROM_EMAIL', 'no-reply@example.com');
+define('SMTP_FROM_NAME', 'Wellness Wonders');
 ?>

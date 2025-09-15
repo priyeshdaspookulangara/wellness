@@ -8,3 +8,66 @@ Stack trace:
 #0 /app/database/migrations/create_search_terms_analytics_table.php(32): up()
 #1 {main}
   thrown in /app/database/migrations/create_search_terms_analytics_table.php on line 7
+[15-Sep-2025 02:00:17 UTC] PHP Fatal error:  Uncaught Error: Call to a member function query() on null in /app/database/migrations/create_password_resets_table.php:16
+Stack trace:
+#0 /app/database/migrations/create_password_resets_table.php(30): up()
+#1 {main}
+  thrown in /app/database/migrations/create_password_resets_table.php on line 16
+[15-Sep-2025 02:03:21 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(4): require_once('...')
+#3 {main}
+  thrown in /app/includes/db.php on line 5
+[15-Sep-2025 02:04:21 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(5): require_once('...')
+#3 {main}
+  thrown in /app/includes/db.php on line 5
+[15-Sep-2025 02:05:21 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(5): require_once('...')
+#3 {main}
+  thrown in /app/includes/db.php on line 5
+[15-Sep-2025 02:06:44 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(5): require_once('...')
+#3 {main}
+  thrown in /app/includes/db.php on line 5
+[15-Sep-2025 02:08:17 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(12): require_once('...')
+#3 {main}
+  thrown in /app/includes/db.php on line 5
+[15-Sep-2025 02:09:39 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(4): require_once('...')
+#3 {main}
+  thrown in /app/includes/db.php on line 5
+[15-Sep-2025 02:11:04 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(4): require_once('...')
+#3 /app/run_migration.php(2): require_once('...')
+#4 {main}
+  thrown in /app/includes/db.php on line 5
+[15-Sep-2025 02:12:25 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /app/includes/db.php:5
+Stack trace:
+#0 /app/includes/db.php(5): mysqli->__construct()
+#1 /app/includes/db.php(16): db_connect()
+#2 /app/database/migrations/create_password_resets_table.php(4): require_once('...')
+#3 /app/run_migration.php(6): require_once('...')
+#4 {main}
+  thrown in /app/includes/db.php on line 5
