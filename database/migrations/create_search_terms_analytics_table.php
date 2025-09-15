@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../includes/db.php';
 
 function up() {
-    $db = db_connect();
+    $db = get_db_connection();
     $sql = "
     CREATE TABLE IF NOT EXISTS search_terms_analytics (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -20,7 +20,7 @@ function up() {
 }
 
 function down() {
-    $db = db_connect();
+    $db = get_db_connection();
     $sql = "DROP TABLE IF EXISTS search_terms_analytics";
     $db->exec($sql);
     echo "search_terms_analytics table dropped successfully.\n";
