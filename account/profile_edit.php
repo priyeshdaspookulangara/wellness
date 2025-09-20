@@ -97,63 +97,70 @@ include_once '../templates/header.php';
 ?>
 
 <div class="container">
-    <h2 class="mt-5 mb-4">Edit Profile & Password</h2>
-
-    <?php if (!empty($errors)): ?>
-        <div class="alert alert-danger">
-            <?php foreach ($errors as $error): ?>
-                <p class="mb-0"><?php echo htmlspecialchars($error); ?></p>
-            <?php endforeach; ?>
+    <div class="row">
+        <div class="col-md-3">
+            <?php include_once 'includes/sidebar.php'; ?>
         </div>
-    <?php endif; ?>
+        <div class="col-md-9">
+            <h2 class="mt-5 mb-4">Edit Profile & Password</h2>
 
-    <!-- Profile Information Form -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Profile Information</h5>
-        </div>
-        <div class="card-body">
-            <?php if ($update_success): ?>
-                <div class="alert alert-success">Profile updated successfully.</div>
+            <?php if (!empty($errors)): ?>
+                <div class="alert alert-danger">
+                    <?php foreach ($errors as $error): ?>
+                        <p class="mb-0"><?php echo htmlspecialchars($error); ?></p>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                <div class="form-group mb-3">
-                    <label for="name">Name</label>
-                    <input type="text" name="name" id="name" class="form-control" value="<?php echo htmlspecialchars($name); ?>" required>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="email">Email Address</label>
-                    <input type="email" name="email" id="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
-                </div>
-                <button type="submit" name="update_profile" class="btn btn-primary">Update Profile</button>
-            </form>
-        </div>
-    </div>
 
-    <!-- Change Password Form -->
-    <div class="card">
-        <div class="card-header">
-            <h5>Change Password</h5>
-        </div>
-        <div class="card-body">
-             <?php if ($password_success): ?>
-                <div class="alert alert-success">Password changed successfully.</div>
-            <?php endif; ?>
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                <div class="form-group mb-3">
-                    <label for="current_password">Current Password</label>
-                    <input type="password" name="current_password" id="current_password" class="form-control" required>
+            <!-- Profile Information Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Profile Information</h5>
                 </div>
-                <div class="form-group mb-3">
-                    <label for="new_password">New Password</label>
-                    <input type="password" name="new_password" id="new_password" class="form-control" required>
+                <div class="card-body">
+                    <?php if ($update_success): ?>
+                        <div class="alert alert-success">Profile updated successfully.</div>
+                    <?php endif; ?>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <div class="form-group mb-3">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" id="name" class="form-control" value="<?php echo htmlspecialchars($name); ?>" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="email">Email Address</label>
+                            <input type="email" name="email" id="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
+                        </div>
+                        <button type="submit" name="update_profile" class="btn btn-primary">Update Profile</button>
+                    </form>
                 </div>
-                <div class="form-group mb-3">
-                    <label for="confirm_password">Confirm New Password</label>
-                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+            </div>
+
+            <!-- Change Password Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Change Password</h5>
                 </div>
-                <button type="submit" name="change_password" class="btn btn-primary">Change Password</button>
-            </form>
+                <div class="card-body">
+                     <?php if ($password_success): ?>
+                        <div class="alert alert-success">Password changed successfully.</div>
+                    <?php endif; ?>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <div class="form-group mb-3">
+                            <label for="current_password">Current Password</label>
+                            <input type="password" name="current_password" id="current_password" class="form-control" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="new_password">New Password</label>
+                            <input type="password" name="new_password" id="new_password" class="form-control" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="confirm_password">Confirm New Password</label>
+                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+                        </div>
+                        <button type="submit" name="change_password" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -84,48 +84,55 @@ include_once '../templates/header.php';
 ?>
 
 <div class="container">
-    <h2 class="mt-5 mb-4">Edit Address</h2>
+    <div class="row">
+        <div class="col-md-3">
+            <?php include_once 'includes/sidebar.php'; ?>
+        </div>
+        <div class="col-md-9">
+            <h2 class="mt-5 mb-4">Edit Address</h2>
 
-    <?php if (!empty($errors)): ?>
-        <div class="alert alert-danger">
-            <?php foreach ($errors as $error): ?>
-                <p class="mb-0"><?php echo htmlspecialchars($error); ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+            <?php if (!empty($errors)): ?>
+                <div class="alert alert-danger">
+                    <?php foreach ($errors as $error): ?>
+                        <p class="mb-0"><?php echo htmlspecialchars($error); ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
 
-    <form action="<?php echo htmlspecialchars($_SERVER["REQUEST_URI"]); ?>" method="post">
-        <div class="form-group mb-3">
-            <label for="address_line1">Address Line 1</label>
-            <input type="text" name="address_line1" id="address_line1" class="form-control" value="<?php echo htmlspecialchars($address_line1); ?>" required>
+            <form action="<?php echo htmlspecialchars($_SERVER["REQUEST_URI"]); ?>" method="post">
+                <div class="form-group mb-3">
+                    <label for="address_line1">Address Line 1</label>
+                    <input type="text" name="address_line1" id="address_line1" class="form-control" value="<?php echo htmlspecialchars($address_line1); ?>" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="address_line2">Address Line 2 (Optional)</label>
+                    <input type="text" name="address_line2" id="address_line2" class="form-control" value="<?php echo htmlspecialchars($address_line2); ?>">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="city">City</label>
+                    <input type="text" name="city" id="city" class="form-control" value="<?php echo htmlspecialchars($city); ?>" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="state">State/Province</label>
+                    <input type="text" name="state" id="state" class="form-control" value="<?php echo htmlspecialchars($state); ?>" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="postal_code">Postal Code</label>
+                    <input type="text" name="postal_code" id="postal_code" class="form-control" value="<?php echo htmlspecialchars($postal_code); ?>" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="country">Country</label>
+                    <input type="text" name="country" id="country" class="form-control" value="<?php echo htmlspecialchars($country); ?>" required>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="is_default" class="form-check-input" id="is_default" <?php if($is_default) echo 'checked'; ?>>
+                    <label class="form-check-label" for="is_default">Set as default address</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="<?php echo SITE_URL; ?>account/manage_addresses.php" class="btn btn-secondary">Cancel</a>
+            </form>
         </div>
-        <div class="form-group mb-3">
-            <label for="address_line2">Address Line 2 (Optional)</label>
-            <input type="text" name="address_line2" id="address_line2" class="form-control" value="<?php echo htmlspecialchars($address_line2); ?>">
-        </div>
-        <div class="form-group mb-3">
-            <label for="city">City</label>
-            <input type="text" name="city" id="city" class="form-control" value="<?php echo htmlspecialchars($city); ?>" required>
-        </div>
-        <div class="form-group mb-3">
-            <label for="state">State/Province</label>
-            <input type="text" name="state" id="state" class="form-control" value="<?php echo htmlspecialchars($state); ?>" required>
-        </div>
-        <div class="form-group mb-3">
-            <label for="postal_code">Postal Code</label>
-            <input type="text" name="postal_code" id="postal_code" class="form-control" value="<?php echo htmlspecialchars($postal_code); ?>" required>
-        </div>
-        <div class="form-group mb-3">
-            <label for="country">Country</label>
-            <input type="text" name="country" id="country" class="form-control" value="<?php echo htmlspecialchars($country); ?>" required>
-        </div>
-        <div class="form-check mb-3">
-            <input type="checkbox" name="is_default" class="form-check-input" id="is_default" <?php if($is_default) echo 'checked'; ?>>
-            <label class="form-check-label" for="is_default">Set as default address</label>
-        </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="<?php echo SITE_URL; ?>account/manage_addresses.php" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div>
 </div>
 
 <?php

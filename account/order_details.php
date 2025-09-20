@@ -59,67 +59,72 @@ include_once '../templates/header.php';
 ?>
 
 <div class="container">
-    <h2 class="mt-5 mb-4">Order Details <small class="text-muted">#<?php echo htmlspecialchars($order['id']); ?></small></h2>
-
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Order Items</h5>
+        <div class="col-md-3">
+            <?php include_once 'includes/sidebar.php'; ?>
+        </div>
+        <div class="col-md-9">
+            <h2 class="mt-5 mb-4">Order Details <small class="text-muted">#<?php echo htmlspecialchars($order['id']); ?></small></h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Order Items</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th class="text-center">Quantity</th>
+                                            <th class="text-right">Price</th>
+                                            <th class="text-right">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($order_items as $item): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                                                <td class="text-center"><?php echo htmlspecialchars($item['quantity']); ?></td>
+                                                <td class="text-right">$<?php echo htmlspecialchars(number_format($item['price'], 2)); ?></td>
+                                                <td class="text-right">$<?php echo htmlspecialchars(number_format($item['price'] * $item['quantity'], 2)); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th class="text-center">Quantity</th>
-                                    <th class="text-right">Price</th>
-                                    <th class="text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($order_items as $item): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($item['product_name']); ?></td>
-                                        <td class="text-center"><?php echo htmlspecialchars($item['quantity']); ?></td>
-                                        <td class="text-right">$<?php echo htmlspecialchars(number_format($item['price'], 2)); ?></td>
-                                        <td class="text-right">$<?php echo htmlspecialchars(number_format($item['price'] * $item['quantity'], 2)); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Order Date:</strong> <?php echo htmlspecialchars(date("F j, Y", strtotime($order['order_date']))); ?></p>
+                            <p><strong>Status:</strong> <?php echo htmlspecialchars(ucfirst($order['status'])); ?></p>
+                            <p class="h5"><strong>Total:</strong> $<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Shipping Address</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                <?php echo htmlspecialchars($order['address_line1']); ?><br>
+                                <?php if (!empty($order['address_line2'])) echo htmlspecialchars($order['address_line2']) . '<br>'; ?>
+                                <?php echo htmlspecialchars($order['city']); ?>, <?php echo htmlspecialchars($order['state']); ?> <?php echo htmlspecialchars($order['postal_code']); ?><br>
+                                <?php echo htmlspecialchars($order['country']); ?>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Order Summary</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Order Date:</strong> <?php echo htmlspecialchars(date("F j, Y", strtotime($order['order_date']))); ?></p>
-                    <p><strong>Status:</strong> <?php echo htmlspecialchars(ucfirst($order['status'])); ?></p>
-                    <p class="h5"><strong>Total:</strong> $<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h5>Shipping Address</h5>
-                </div>
-                <div class="card-body">
-                    <p>
-                        <?php echo htmlspecialchars($order['address_line1']); ?><br>
-                        <?php if (!empty($order['address_line2'])) echo htmlspecialchars($order['address_line2']) . '<br>'; ?>
-                        <?php echo htmlspecialchars($order['city']); ?>, <?php echo htmlspecialchars($order['state']); ?> <?php echo htmlspecialchars($order['postal_code']); ?><br>
-                        <?php echo htmlspecialchars($order['country']); ?>
-                    </p>
-                </div>
-            </div>
-        </div>
     </div>
-    <a href="<?php echo SITE_URL; ?>account/order_history.php" class="btn btn-secondary mt-4"><i class="fas fa-arrow-left"></i> Back to Order History</a>
 </div>
 
 <?php

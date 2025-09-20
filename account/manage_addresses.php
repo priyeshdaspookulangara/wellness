@@ -36,46 +36,53 @@ $conn->close();
 ?>
 
 <div class="container">
-    <h2 class="mt-5 mb-4">Manage Addresses</h2>
-    <a href="<?php echo SITE_URL; ?>account/add_address.php" class="btn btn-primary mb-4">Add New Address</a>
-
-    <?php if (isset($_SESSION['message'])): ?>
-        <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($_SESSION['message']); ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <div class="row">
+        <div class="col-md-3">
+            <?php include_once 'includes/sidebar.php'; ?>
         </div>
-        <?php unset($_SESSION['message'], $_SESSION['message_type']); ?>
-    <?php endif; ?>
+        <div class="col-md-9">
+            <h2 class="mt-5 mb-4">Manage Addresses</h2>
+            <a href="<?php echo SITE_URL; ?>account/add_address.php" class="btn btn-primary mb-4">Add New Address</a>
 
-    <?php if (count($addresses) > 0): ?>
-        <div class="row">
-            <?php foreach ($addresses as $address): ?>
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <?php echo htmlspecialchars($address['address_line1']); ?>
-                                <?php if ($address['is_default']): ?>
-                                    <span class="badge bg-success">Default</span>
-                                <?php endif; ?>
-                            </h5>
-                            <p class="card-text">
-                                <?php if(!empty($address['address_line2'])) echo htmlspecialchars($address['address_line2']) . '<br>'; ?>
-                                <?php echo htmlspecialchars($address['city']); ?>, <?php echo htmlspecialchars($address['state']); ?> <?php echo htmlspecialchars($address['postal_code']); ?><br>
-                                <?php echo htmlspecialchars($address['country']); ?>
-                            </p>
-                            <a href="<?php echo SITE_URL; ?>account/edit_address.php?id=<?php echo $address['id']; ?>" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="<?php echo SITE_URL; ?>account/delete_address.php?id=<?php echo $address['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address? You cannot delete your default address.');">Delete</a>
-                        </div>
-                    </div>
+            <?php if (isset($_SESSION['message'])): ?>
+                <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
+                    <?php echo htmlspecialchars($_SESSION['message']); ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
-            <?php endforeach; ?>
+                <?php unset($_SESSION['message'], $_SESSION['message_type']); ?>
+            <?php endif; ?>
+
+            <?php if (count($addresses) > 0): ?>
+                <div class="row">
+                    <?php foreach ($addresses as $address): ?>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <?php echo htmlspecialchars($address['address_line1']); ?>
+                                        <?php if ($address['is_default']): ?>
+                                            <span class="badge bg-success">Default</span>
+                                        <?php endif; ?>
+                                    </h5>
+                                    <p class="card-text">
+                                        <?php if(!empty($address['address_line2'])) echo htmlspecialchars($address['address_line2']) . '<br>'; ?>
+                                        <?php echo htmlspecialchars($address['city']); ?>, <?php echo htmlspecialchars($address['state']); ?> <?php echo htmlspecialchars($address['postal_code']); ?><br>
+                                        <?php echo htmlspecialchars($address['country']); ?>
+                                    </p>
+                                    <a href="<?php echo SITE_URL; ?>account/edit_address.php?id=<?php echo $address['id']; ?>" class="btn btn-secondary btn-sm">Edit</a>
+                                    <a href="<?php echo SITE_URL; ?>account/delete_address.php?id=<?php echo $address['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address? You cannot delete your default address.');">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="alert alert-info">
+                    You have not saved any addresses yet.
+                </div>
+            <?php endif; ?>
         </div>
-    <?php else: ?>
-        <div class="alert alert-info">
-            You have not saved any addresses yet.
-        </div>
-    <?php endif; ?>
+    </div>
 </div>
 
 <?php
