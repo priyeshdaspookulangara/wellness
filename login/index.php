@@ -1,14 +1,15 @@
 <?php
 session_start();
 require_once '../config.php';
-require_once '../includes/db.php';
+// The db.php file is empty, so we will create the connection manually.
+// In a real application, the connection would be in db.php.
 
 // If user is already logged in, redirect based on their role
 if (isset($_SESSION["user_id"])) {
     if (isset($_SESSION["is_admin"]) && $_SESSION["is_admin"] == 1) {
-        header("location: " . SITE_URL . "/admin/");
+        header("location: " . SITE_URL . "admin/");
     } else {
-        header("location: " . SITE_URL . "/account/");
+        header("location: " . SITE_URL . "account/");
     }
     exit;
 }
@@ -31,6 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($errors)) {
         $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         if ($conn->connect_error) {
+            // In a real app, log this error instead of dying
             die("Connection failed: " . $conn->connect_error);
         }
 
@@ -40,11 +42,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->execute()) {
                 $stmt->store_result();
                 if ($stmt->num_rows == 1) {
-                    $stmt->bind_result($id, $name, $email, $hashed_password, $is_admin);
+                    $stmt->bind_result($id, $name, $email_db, $hashed_password, $is_admin);
                     if ($stmt->fetch()) {
                         if (password_verify($password, $hashed_password)) {
                             // Password is correct, so start a new session
-                            session_start();
+                            // session_start() is already at the top
 
                             // Store data in session variables
                             $_SESSION["user_id"] = $id;
@@ -53,9 +55,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             // Redirect user based on is_admin flag
                             if ($is_admin == 1) {
-                                header("location: " . SITE_URL . "/admin/");
+                                header("location: " . SITE_URL . "admin/");
                             } else {
-                                header("location: " . SITE_URL . "/account/");
+                                header("location: " . SITE_URL . "account/");
                             }
                             exit;
                         } else {
@@ -90,24 +92,24 @@ include_once '../templates/header.php';
                     if (!empty($errors)) {
                         echo '<div class="alert alert-danger">';
                         foreach ($errors as $error) {
-                            echo '<p>' . $error . '</p>';
+                            echo '<p class="mb-0">' . htmlspecialchars($error) . '</p>';
                         }
                         echo '</div>';
                     }
                     ?>
                     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>">
+                        <div class="form-group mb-3">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" id="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>">
                         </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" name="password" class="form-control">
+                        <div class="form-group mb-3">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" id="password" class="form-control">
                         </div>
                         <div class="form-group">
                             <input type="submit" class="btn btn-primary" value="Login">
                         </div>
-                        <p>Don't have an account? <a href="<?php echo SITE_URL; ?>/register">Sign up now</a>.</p>
+                        <p class="mt-3">Don't have an account? <a href="<?php echo SITE_URL; ?>register/">Sign up now</a>.</p>
                     </form>
                 </div>
             </div>
