@@ -1,10 +1,10 @@
 <?php
 session_start();
 require_once '../config.php';
-require_once '../includes/db.php';
 
+// Check if the user is logged in, otherwise redirect to login page
 if (!isset($_SESSION["user_id"])) {
-    header("location: " . SITE_URL . "/login");
+    header("location: " . SITE_URL . "login/");
     exit;
 }
 
@@ -33,33 +33,35 @@ $conn->close();
 <div class="container">
     <h2 class="mt-5 mb-4">Order History</h2>
     <?php if (count($orders) > 0): ?>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Date</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($orders as $order): ?>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
                     <tr>
-                        <td>#<?php echo htmlspecialchars($order['id']); ?></td>
-                        <td><?php echo htmlspecialchars(date("F j, Y", strtotime($order['order_date']))); ?></td>
-                        <td>$<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
-                        <td><?php echo htmlspecialchars(ucfirst($order['status'])); ?></td>
-                        <td>
-                            <a href="<?php echo SITE_URL; ?>/account/order_details.php?order_id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">View Details</a>
-                        </td>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($orders as $order): ?>
+                        <tr>
+                            <td>#<?php echo htmlspecialchars($order['id']); ?></td>
+                            <td><?php echo htmlspecialchars(date("F j, Y", strtotime($order['order_date']))); ?></td>
+                            <td>$<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
+                            <td><?php echo htmlspecialchars(ucfirst($order['status'])); ?></td>
+                            <td>
+                                <a href="<?php echo SITE_URL; ?>account/order_details.php?order_id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">View Details</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php else: ?>
         <div class="alert alert-info">
-            You have not placed any orders yet.
+            You have not placed any orders yet. <a href="<?php echo SITE_URL; ?>">Browse products</a>.
         </div>
     <?php endif; ?>
 </div>

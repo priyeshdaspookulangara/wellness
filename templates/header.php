@@ -55,12 +55,12 @@ $basePath = rtrim(str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['S
                         <i class="fas fa-user"></i> Account
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/account/index.php">My Account</a>
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/account/order_history.php">Order History</a>
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/account/manage_addresses.php">Manage Addresses</a>
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/account/profile_edit.php">Edit Profile</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>account/index.php">My Account</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>account/order_history.php">Order History</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>account/manage_addresses.php">Manage Addresses</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>account/profile_edit.php">Edit Profile</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>/logout.php">Logout</a>
+                        <a class="dropdown-item" href="<?php echo SITE_URL; ?>logout.php">Logout</a>
                     </div>
                 </li>
             <?php else: ?>

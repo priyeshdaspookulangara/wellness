@@ -1,0 +1,1 @@
+<?php // Manage Addresses Page ?>
