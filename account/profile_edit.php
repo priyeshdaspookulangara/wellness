@@ -90,7 +90,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-$conn->close();
 
 $pageTitle = "Edit Profile";
 include_once '../templates/header.php';
@@ -166,5 +165,6 @@ include_once '../templates/header.php';
 </div>
 
 <?php
+$conn->close();
 include_once '../templates/footer.php';
 ?>
