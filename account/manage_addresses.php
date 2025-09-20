@@ -32,7 +32,7 @@ $conn->close();
 
 <div class="container">
     <h2 class="mt-5 mb-4">Manage Addresses</h2>
-    <a href="<?php echo SITE_URL; ?>/manage_addresses/add.php" class="btn btn-primary mb-3">Add New Address</a>
+    <a href="<?php echo SITE_URL; ?>/account/add_address.php" class="btn btn-primary mb-3">Add New Address</a>
 
     <?php if (count($addresses) > 0): ?>
         <div class="row">
@@ -51,8 +51,8 @@ $conn->close();
                                 <?php echo htmlspecialchars($address['city']); ?>, <?php echo htmlspecialchars($address['state']); ?> <?php echo htmlspecialchars($address['postal_code']); ?><br>
                                 <?php echo htmlspecialchars($address['country']); ?>
                             </p>
-                            <a href="<?php echo SITE_URL; ?>/manage_addresses/edit.php?id=<?php echo $address['id']; ?>" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="<?php echo SITE_URL; ?>/manage_addresses/delete.php?id=<?php echo $address['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address?');">Delete</a>
+                            <a href="<?php echo SITE_URL; ?>/account/edit_address.php?id=<?php echo $address['id']; ?>" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="<?php echo SITE_URL; ?>/account/delete_address.php?id=<?php echo $address['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address?');">Delete</a>
                         </div>
                     </div>
                 </div>

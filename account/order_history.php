@@ -51,7 +51,7 @@ $conn->close();
                         <td>$<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
                         <td><?php echo htmlspecialchars(ucfirst($order['status'])); ?></td>
                         <td>
-                            <a href="<?php echo SITE_URL; ?>/order_details?order_id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">View Details</a>
+                            <a href="<?php echo SITE_URL; ?>/account/order_details.php?order_id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">View Details</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

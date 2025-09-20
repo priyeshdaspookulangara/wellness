@@ -19,13 +19,13 @@ include_once '../templates/header.php';
     <p>From your account dashboard you can view your recent orders, manage your shipping and billing addresses, and edit your password and account details.</p>
 
     <div class="list-group">
-        <a href="<?php echo SITE_URL; ?>/order_history" class="list-group-item list-group-item-action">
+        <a href="<?php echo SITE_URL; ?>/account/order_history.php" class="list-group-item list-group-item-action">
             Order History
         </a>
-        <a href="<?php echo SITE_URL; ?>/manage_addresses" class="list-group-item list-group-item-action">
+        <a href="<?php echo SITE_URL; ?>/account/manage_addresses.php" class="list-group-item list-group-item-action">
             Manage Addresses
         </a>
-        <a href="<?php echo SITE_URL; ?>/profile_edit" class="list-group-item list-group-item-action">
+        <a href="<?php echo SITE_URL; ?>/account/profile_edit.php" class="list-group-item list-group-item-action">
             Edit Profile & Password
         </a>
         <a href="<?php echo SITE_URL; ?>/logout.php" class="list-group-item list-group-item-action text-danger">
