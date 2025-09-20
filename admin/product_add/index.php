@@ -91,42 +91,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Escaping and SQL insertion logic (same as before)
-        $name_esc = escape_string($product_data['name']);
-        $slug_esc = escape_string($product_data['slug']);
-        // ... (all other escapes) ...
-        $desc_esc = escape_string($product_data['description']);
-        $how_it_works_esc = escape_string($product_data['how_it_works']);
-        $health_benefits_esc = escape_string($product_data['health_benefits_text']);
-        $gauss_esc = escape_string($product_data['gauss_strength']);
-        $material_esc = escape_string($product_data['material_quality_design']);
-        $usage_esc = escape_string($product_data['usage_guide_text']);
-        $price_esc = (float)$product_data['price'];
-        $stock_esc = (int)$product_data['stock'];
-        $category_id_esc = (int)$product_data['category_id'];
-        $is_featured_esc = (int)$product_data['is_featured'];
-        $is_on_sale_esc = (int)$product_data['is_on_sale'];
-        $sale_price_esc = $product_data['is_on_sale'] && !empty($product_data['sale_price']) ? (float)$product_data['sale_price'] : 'NULL';
-        $image_file_name_esc = $image_file_name ? "'" . escape_string($image_file_name) . "'" : 'NULL';
-
-        $sql_check_slug = "SELECT id FROM products WHERE slug = '$slug_esc'";
-        $res_slug = mysqli_query($conn, $sql_check_slug);
-        if (mysqli_num_rows($res_slug) > 0) {
+        // Check for existing slug using prepared statement
+        $stmt_check_slug = $conn->prepare("SELECT id FROM products WHERE slug = ?");
+        $stmt_check_slug->bind_param("s", $product_data['slug']);
+        $stmt_check_slug->execute();
+        $stmt_check_slug->store_result();
+        if ($stmt_check_slug->num_rows > 0) {
             $errors[] = "Product slug already exists. Please choose a unique slug.";
-        } else {
-            $sql_insert = "INSERT INTO products (name, slug, category_id, description, how_it_works, health_benefits_text, gauss_strength, material_quality_design, usage_guide_text, price, stock, image_url_main, is_featured, is_on_sale, sale_price, created_at, updated_at)
-                           VALUES ('$name_esc', '$slug_esc', $category_id_esc, '$desc_esc', '$how_it_works_esc', '$health_benefits_esc', '$gauss_esc', '$material_esc', '$usage_esc', $price_esc, $stock_esc, $image_file_name_esc, $is_featured_esc, $is_on_sale_esc, $sale_price_esc, NOW(), NOW())";
+        }
+        $stmt_check_slug->close();
 
-            if (mysqli_query($conn, $sql_insert)) {
+        if (empty($errors)) {
+            $sql_insert = "INSERT INTO products (name, slug, category_id, description, how_it_works, health_benefits_text, gauss_strength, material_quality_design, usage_guide_text, price, stock, image_url_main, is_featured, is_on_sale, sale_price, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+            $stmt_insert = $conn->prepare($sql_insert);
+            $sale_price_val = $product_data['is_on_sale'] ? $product_data['sale_price'] : null;
+            $stmt_insert->bind_param(
+                "ssissssssdisiis",
+                $product_data['name'], $product_data['slug'], $product_data['category_id'], $product_data['description'],
+                $product_data['how_it_works'], $product_data['health_benefits_text'], $product_data['gauss_strength'],
+                $product_data['material_quality_design'], $product_data['usage_guide_text'], $product_data['price'],
+                $product_data['stock'], $image_file_name, $product_data['is_featured'], $product_data['is_on_sale'], $sale_price_val
+            );
+
+            if ($stmt_insert->execute()) {
+                $new_product_id = $conn->insert_id;
+
+                // Handle additional images with prepared statements
+                if (isset($_FILES['additional_images'])) {
+                    $upload_dir = __DIR__ . '/../../uploads/';
+                    $stmt_media = $conn->prepare("INSERT INTO product_media (product_id, media_type, path_or_url) VALUES (?, 'image', ?)");
+                    foreach ($_FILES['additional_images']['name'] as $key => $name) {
+                        if ($_FILES['additional_images']['error'][$key] == UPLOAD_ERR_OK) {
+                            $file_info = pathinfo($name);
+                            $image_file = uniqid('prod_add_') . '.' . strtolower($file_info['extension']);
+                            $target_file = $upload_dir . $image_file;
+                            if (move_uploaded_file($_FILES['additional_images']['tmp_name'][$key], $target_file)) {
+                                $stmt_media->bind_param("is", $new_product_id, $image_file);
+                                $stmt_media->execute();
+                            }
+                        }
+                    }
+                    $stmt_media->close();
+                }
+
+                // Handle video URL with prepared statements
+                if (!empty($_POST['video_url'])) {
+                    $video_url = trim($_POST['video_url']);
+                    if (filter_var($video_url, FILTER_VALIDATE_URL)) {
+                        $stmt_video = $conn->prepare("INSERT INTO product_media (product_id, media_type, path_or_url) VALUES (?, 'video', ?)");
+                        $stmt_video->bind_param("is", $new_product_id, $video_url);
+                        $stmt_video->execute();
+                        $stmt_video->close();
+                    }
+                }
+
                 $_SESSION['success_message'] = "Product added successfully!";
-                header("Location: " . SITE_URL . "admin/products/"); // Corrected redirect
+                header("Location: " . SITE_URL . "admin/products/");
                 exit;
             } else {
-                $errors[] = "Failed to add product: " . mysqli_error($conn);
+                $errors[] = "Failed to add product: " . $stmt_insert->error;
                 if ($image_file_name && file_exists($upload_dir . $image_file_name)) {
                     unlink($upload_dir . $image_file_name);
                 }
             }
+            $stmt_insert->close();
         }
     }
 }
@@ -233,8 +261,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body">
                     <div class="form-group mb-3">
                         <label for="image_url_main">Main Product Image</label>
-                        <input type="file" class="form-control" id="image_url_main" name="image_url_main"> <!-- BS5 uses form-control for file inputs -->
-                        <small class="form-text text-muted">Max 2MB. Allowed types: JPG, PNG, GIF, WEBP.</small>
+                        <input type="file" class="form-control" id="image_url_main" name="image_url_main">
+                        <small class="form-text text-muted">This will be the primary image displayed in listings.</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="additional_images">Additional Images</label>
+                        <input type="file" class="form-control" id="additional_images" name="additional_images[]" multiple>
+                        <small class="form-text text-muted">You can select multiple images. Max 2MB each.</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="video_url">Product Video URL</label>
+                        <input type="text" class="form-control" id="video_url" name="video_url" placeholder="e.g., https://www.youtube.com/watch?v=...">
+                        <small class="form-text text-muted">Enter the full URL for the product video (e.g., from YouTube, Vimeo).</small>
                     </div>
                 </div>
             </div>
