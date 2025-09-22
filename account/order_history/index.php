@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config.php';
+require_once '../../config.php';
 
 // Check if the user is logged in, otherwise redirect to login page
 if (!isset($_SESSION["user_id"])) {
@@ -9,7 +9,7 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 $pageTitle = "Order History";
-include_once '../templates/header.php';
+include_once '../../templates/header.php';
 
 // Database connection
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
@@ -33,7 +33,7 @@ $conn->close();
 <div class="container">
     <div class="row">
         <div class="col-md-3">
-            <?php include_once 'includes/sidebar.php'; ?>
+            <?php include_once '../includes/sidebar.php'; ?>
         </div>
         <div class="col-md-9">
             <h2 class="mt-5 mb-4">Order History</h2>
@@ -57,7 +57,7 @@ $conn->close();
                                     <td>$<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
                                     <td><?php echo htmlspecialchars(ucfirst($order['status'])); ?></td>
                                     <td>
-                                        <a href="<?php echo SITE_URL; ?>account/order_details.php?order_id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">View Details</a>
+                                        <a href="<?php echo SITE_URL; ?>account/order_details/?order_id=<?php echo $order['id']; ?>" class="btn btn-primary btn-sm">View Details</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -74,5 +74,5 @@ $conn->close();
 </div>
 
 <?php
-include_once '../templates/footer.php';
+include_once '../../templates/footer.php';
 ?>
