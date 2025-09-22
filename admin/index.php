@@ -32,7 +32,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="h5 mb-0 font-weight-bold text-gray-800">$0.00</div> <!-- Placeholder -->
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div> <!-- Placeholder -->
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-box fa-2x text-gray-300"></i>
+                        <i class="fas fa-cubes fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div> <!-- Placeholder -->
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        <i class="fas fa-shopping-basket fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
@@ -80,7 +80,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div> <!-- Placeholder -->
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-comments fa-2x text-gray-300"></i>
+                        <i class="fas fa-star-half-alt fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
