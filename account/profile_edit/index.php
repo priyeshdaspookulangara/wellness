@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config.php';
+require_once '../../config.php';
 
 // Check if the user is logged in, otherwise redirect to login page
 if (!isset($_SESSION["user_id"])) {
@@ -92,13 +92,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 $pageTitle = "Edit Profile";
-include_once '../templates/header.php';
+include_once '../../templates/header.php';
 ?>
 
 <div class="container">
     <div class="row">
         <div class="col-md-3">
-            <?php include_once 'includes/sidebar.php'; ?>
+            <?php include_once '../includes/sidebar.php'; ?>
         </div>
         <div class="col-md-9">
             <h2 class="mt-5 mb-4">Edit Profile & Password</h2>
@@ -166,5 +166,5 @@ include_once '../templates/header.php';
 
 <?php
 $conn->close();
-include_once '../templates/footer.php';
+include_once '../../templates/footer.php';
 ?>

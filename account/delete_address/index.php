@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config.php';
+require_once '../../config.php';
 
 if (!isset($_SESSION["user_id"])) {
     header("location: " . SITE_URL . "login/");
@@ -43,6 +43,6 @@ if ($address_id > 0) {
     $conn->close();
 }
 
-header("location: " . SITE_URL . "account/manage_addresses.php");
+header("location: " . SITE_URL . "account/manage_addresses/");
 exit;
 ?>
