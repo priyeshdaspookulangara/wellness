@@ -5,7 +5,7 @@
 
 :root {
     /* Modern Color Palette */
-    --primary-color: #0d6efd;       /* Keeping Bootstrap's primary for some core components */
+    --primary-color: #0d6efd;
     --secondary-color: #6c757d;
     --accent-color: #17a2b8;        /* Muted Teal/Blue */
     --accent-color-dark: #138496;
@@ -35,7 +35,7 @@
     --font-weight-bold: 600;
 
     /* Spacing & Style */
-    --main-content-padding: 1.5rem;
+    --main-content-padding: 1.5rem; /* Reduced padding to address user feedback about the gap */
     --card-padding: 1.75rem;
     --card-border-radius: 0.5rem;
     --card-box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07);
