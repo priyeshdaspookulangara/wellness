@@ -42,12 +42,12 @@ if ($active_section == 'index.php') $active_section = 'dashboard';
 
         <ul class="list-unstyled components accordion" id="sidebarAccordion">
             <li class="nav-item <?php echo ($active_section == 'dashboard') ? 'active' : ''; ?>">
-                <a class="nav-link" href="<?php echo SITE_URL; ?>admin/"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link" href="<?php echo SITE_URL; ?>admin/"><i class="fas fa-th-large"></i> Dashboard</a>
             </li>
 
             <li class="nav-item">
                 <a href="#storeSubmenu" data-bs-toggle="collapse" aria-expanded="<?php echo in_array($active_section, ['products', 'categories', 'orders']) ? 'true' : 'false'; ?>" class="nav-link dropdown-toggle <?php echo in_array($active_section, ['products', 'categories', 'orders']) ? '' : 'collapsed'; ?>">
-                    <i class="fas fa-store"></i> Store
+                    <i class="fas fa-shopping-cart"></i> Store
                 </a>
                 <ul class="collapse list-unstyled <?php echo in_array($active_section, ['products', 'categories', 'orders']) ? 'show' : ''; ?>" id="storeSubmenu" data-bs-parent="#sidebarAccordion">
                     <li><a class="nav-link <?php echo ($active_section == 'products') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/products/">Products</a></li>
@@ -57,12 +57,12 @@ if ($active_section == 'index.php') $active_section = 'dashboard';
             </li>
 
             <li class="nav-item <?php echo ($active_section == 'users') ? 'active' : ''; ?>">
-                <a class="nav-link" href="<?php echo SITE_URL; ?>admin/users/"><i class="fas fa-users"></i> Users</a>
+                <a class="nav-link" href="<?php echo SITE_URL; ?>admin/users/"><i class="fas fa-user-friends"></i> Users</a>
             </li>
 
             <li class="nav-item">
                 <a href="#contentSubmenu" data-bs-toggle="collapse" aria-expanded="<?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? 'true' : 'false'; ?>" class="nav-link dropdown-toggle <?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? '' : 'collapsed'; ?>">
-                    <i class="fas fa-file-alt"></i> Content
+                    <i class="fas fa-pencil-alt"></i> Content
                 </a>
                 <ul class="collapse list-unstyled <?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? 'show' : ''; ?>" id="contentSubmenu" data-bs-parent="#sidebarAccordion">
                     <li><a class="nav-link <?php echo ($active_section == 'blog_posts') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/blog_posts/">Blog Posts</a></li>
@@ -73,7 +73,7 @@ if ($active_section == 'index.php') $active_section = 'dashboard';
 
             <li class="nav-item">
                 <a href="#reportsSubmenu" data-bs-toggle="collapse" aria-expanded="<?php echo in_array($active_section, ['reports_sales', 'reports_inventory', 'reports_customers']) ? 'true' : 'false'; ?>" class="nav-link dropdown-toggle <?php echo in_array($active_section, ['reports_sales', 'reports_inventory', 'reports_customers']) ? '' : 'collapsed'; ?>">
-                    <i class="fas fa-chart-pie"></i> Reports
+                    <i class="fas fa-chart-bar"></i> Reports
                 </a>
                 <ul class="collapse list-unstyled <?php echo in_array($active_section, ['reports_sales', 'reports_inventory', 'reports_customers']) ? 'show' : ''; ?>" id="reportsSubmenu" data-bs-parent="#sidebarAccordion">
                     <li><a class="nav-link <?php echo ($active_section == 'reports_sales') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/reports_sales/">Sales Reports</a></li>
