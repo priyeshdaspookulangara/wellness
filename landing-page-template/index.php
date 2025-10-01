@@ -2,10 +2,9 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/db.php';
 
-// This is a placeholder for the product-specific logic.
-// When a landing page is created, a product ID will need to be associated with it.
-// For now, we'll assume a static product ID for template purposes.
-$product_id = 1; // Example product ID
+// The {{PRODUCT_ID}} placeholder will be replaced by the actual product ID
+// during the landing page creation process.
+$product_id = {{PRODUCT_ID}};
 
 // Fetch product details from the database
 $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");

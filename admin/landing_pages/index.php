@@ -34,10 +34,10 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
 </div>
 
 <?php if ($success_message): ?>
-    <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
+    <div class="alert alert-success"><?php echo $success_message; ?></div>
 <?php endif; ?>
 <?php if ($error_message): ?>
-    <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
+    <div class="alert alert-danger"><?php echo $error_message; ?></div>
 <?php endif; ?>
 
 <div class="card">

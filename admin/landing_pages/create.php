@@ -86,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $landing_page_index = $new_dir . '/index.php';
     if (file_exists($landing_page_index)) {
         $content = file_get_contents($landing_page_index);
-        // Replace the placeholder product ID with the actual product ID
-        $content = preg_replace('/\$product_id\s*=\s*\d+;/', '$product_id = ' . $product_id . ';', $content);
+        // Replace the placeholder with the actual product ID
+        $content = str_replace('{{PRODUCT_ID}}', $product_id, $content);
         file_put_contents($landing_page_index, $content);
     }
 

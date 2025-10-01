@@ -1,0 +1,15 @@
+# Log files
+php_errors.log
+
+# Vendor directories
+/vendor/
+
+# User-uploaded content
+/uploads/
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
