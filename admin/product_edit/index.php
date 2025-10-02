@@ -68,29 +68,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Handle image upload
-    $new_image_file_name = $original_image; // Keep old image by default
+    $image_to_update = $original_image;
     if (isset($_FILES['image_url_main']) && $_FILES['image_url_main']['error'] == UPLOAD_ERR_OK) {
         $upload_dir = __DIR__ . '/../../uploads/';
         $file_info = pathinfo($_FILES['image_url_main']['name']);
-        $new_image_file_name = uniqid('prod_') . '.' . strtolower($file_info['extension']);
-        $target_file = $upload_dir . $new_image_file_name;
+        $new_image_name = uniqid('prod_') . '.' . strtolower($file_info['extension']);
+        $target_file = $upload_dir . $new_image_name;
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        $is_valid_upload = true;
         if (!in_array(strtolower($file_info['extension']), $allowed_types)) {
             $errors[] = "Invalid image file type.";
-            $new_image_file_name = $original_image;
+            $is_valid_upload = false;
         } elseif ($_FILES['image_url_main']['size'] > 2 * 1024 * 1024) {
             $errors[] = "Image file size exceeds 2MB limit.";
-            $new_image_file_name = $original_image;
-        } elseif (!move_uploaded_file($_FILES['image_url_main']['tmp_name'], $target_file)) {
-            $errors[] = "Failed to upload new image.";
-            $new_image_file_name = $original_image;
-        } else {
-            if (!empty($original_image) && file_exists($upload_dir . $original_image)) {
-                unlink($upload_dir . $original_image);
+            $is_valid_upload = false;
+        }
+
+        if ($is_valid_upload) {
+            if (move_uploaded_file($_FILES['image_url_main']['tmp_name'], $target_file)) {
+                $image_to_update = $new_image_name;
+                if (!empty($original_image) && file_exists($upload_dir . $original_image)) {
+                    unlink($upload_dir . $original_image);
+                }
+            } else {
+                $errors[] = "Failed to upload new image.";
             }
         }
     }
-    $product_data['image_url_main'] = $new_image_file_name;
+    $product_data['image_url_main'] = $image_to_update;
 
     if (empty($errors)) {
         $stmt_check_slug = $conn->prepare("SELECT id FROM products WHERE slug = ? AND id != ?");
@@ -112,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $product_data['name'], $product_data['slug'], $product_data['category_id'],
                 $product_data['description'], $product_data['how_it_works'], $product_data['health_benefits_text'],
                 $product_data['gauss_strength'], $product_data['material_quality_design'], $product_data['usage_guide_text'],
-                $product_data['price'], $product_data['stock'], $new_image_file_name,
+                $product_data['price'], $product_data['stock'], $image_to_update,
                 $product_data['is_featured'], $product_data['is_on_sale'], $product_data['sale_price'],
                 $product_id
             );
