@@ -18,12 +18,12 @@ if (!$product_id) {
     exit;
 }
 
-// Fetch product data from the database
+// Fetch product data from the database to be used for the form and update logic
 $sql_product = "SELECT * FROM products WHERE id = ?";
-$stmt = $conn->prepare($sql_product);
-$stmt->bind_param("i", $product_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt_fetch = $conn->prepare($sql_product);
+$stmt_fetch->bind_param("i", $product_id);
+$stmt_fetch->execute();
+$result = $stmt_fetch->get_result();
 $product_data = $result->fetch_assoc();
 
 if (!$product_data) {
@@ -32,27 +32,13 @@ if (!$product_data) {
     exit;
 }
 
-// Fetch categories for dropdown
-$sql_categories = "SELECT id, name FROM categories ORDER BY name ASC";
-$result_categories = mysqli_query($conn, $sql_categories);
-$categories = [];
-if ($result_categories) {
-    while ($row = mysqli_fetch_assoc($result_categories)) {
-        $categories[] = $row;
-    }
-}
-
-$page_title = "Edit Product";
-$breadcrumbs = [
-    ['name' => 'Products', 'link' => SITE_URL . 'admin/products/'],
-    ['name' => 'Edit Product']
-];
-require_once __DIR__ . '/../includes/header.php';
-
 $errors = [];
 
+// Handle form submission before any HTML output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize and retrieve form data
+    $original_image = $product_data['image_url_main'];
+
+    // Sanitize and retrieve form data, updating the $product_data array for form repopulation
     $product_data['name'] = trim($_POST['name'] ?? '');
     $product_data['slug'] = trim($_POST['slug'] ?? '');
     $product_data['category_id'] = (int)($_POST['category_id'] ?? 0);
@@ -82,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Handle image upload
-    $new_image_file_name = $product_data['image_url_main']; // Keep old image by default
+    $new_image_file_name = $original_image; // Keep old image by default
     if (isset($_FILES['image_url_main']) && $_FILES['image_url_main']['error'] == UPLOAD_ERR_OK) {
         $upload_dir = __DIR__ . '/../../uploads/';
         $file_info = pathinfo($_FILES['image_url_main']['name']);
@@ -91,20 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (!in_array(strtolower($file_info['extension']), $allowed_types)) {
             $errors[] = "Invalid image file type.";
-            $new_image_file_name = $product_data['image_url_main']; // Revert to old image
+            $new_image_file_name = $original_image;
         } elseif ($_FILES['image_url_main']['size'] > 2 * 1024 * 1024) {
             $errors[] = "Image file size exceeds 2MB limit.";
-            $new_image_file_name = $product_data['image_url_main'];
+            $new_image_file_name = $original_image;
         } elseif (!move_uploaded_file($_FILES['image_url_main']['tmp_name'], $target_file)) {
             $errors[] = "Failed to upload new image.";
-            $new_image_file_name = $product_data['image_url_main'];
+            $new_image_file_name = $original_image;
         } else {
-            // New image uploaded successfully, delete old one if it exists
-            if (!empty($product_data['image_url_main']) && file_exists($upload_dir . $product_data['image_url_main'])) {
-                unlink($upload_dir . $product_data['image_url_main']);
+            if (!empty($original_image) && file_exists($upload_dir . $original_image)) {
+                unlink($upload_dir . $original_image);
             }
         }
     }
+    $product_data['image_url_main'] = $new_image_file_name;
 
     if (empty($errors)) {
         $stmt_check_slug = $conn->prepare("SELECT id FROM products WHERE slug = ? AND id != ?");
@@ -141,6 +127,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Fetch categories for dropdown
+$sql_categories = "SELECT id, name FROM categories ORDER BY name ASC";
+$result_categories = mysqli_query($conn, $sql_categories);
+$categories = [];
+if ($result_categories) {
+    while ($row = mysqli_fetch_assoc($result_categories)) {
+        $categories[] = $row;
+    }
+}
+
+$page_title = "Edit Product";
+$breadcrumbs = [
+    ['name' => 'Products', 'link' => SITE_URL . 'admin/products/'],
+    ['name' => 'Edit Product']
+];
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
