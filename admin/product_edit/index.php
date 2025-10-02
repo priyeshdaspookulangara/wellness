@@ -18,7 +18,7 @@ if (!$product_id) {
     exit;
 }
 
-// Fetch product data from the database to be used for the form and update logic
+// Fetch product data from the database
 $stmt_fetch = $conn->prepare("SELECT * FROM products WHERE id = ?");
 $stmt_fetch->bind_param("i", $product_id);
 $stmt_fetch->execute();
@@ -36,7 +36,8 @@ $errors = [];
 // Handle form submission before any HTML output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Start with the existing image name. This will only be overwritten if a new image is successfully uploaded.
-    $image_filename_to_update = $product_data['image_url_main'];
+    $image_filename_for_db = $product_data['image_url_main'];
+    $new_image_uploaded = false;
 
     // Check if a new file has been uploaded and there are no upload errors.
     if (isset($_FILES['image_url_main']) && $_FILES['image_url_main']['error'] === UPLOAD_ERR_OK) {
@@ -57,12 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($upload_ok) {
             if (move_uploaded_file($_FILES['image_url_main']['tmp_name'], $target_file)) {
-                // SUCCESS: The new file is saved. Set it as the filename for the database.
-                $image_filename_to_update = $new_image_name;
-                // Delete the old image file if it exists and is different from the new one.
-                if (!empty($product_data['image_url_main']) && file_exists($upload_dir . $product_data['image_url_main'])) {
-                    unlink($upload_dir . $product_data['image_url_main']);
-                }
+                $image_filename_for_db = $new_image_name;
+                $new_image_uploaded = true;
             } else {
                 $errors[] = "Failed to move uploaded file.";
             }
@@ -90,7 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Other validations...
     if (empty($submitted_data['name'])) $errors[] = "Product name is required.";
     if (empty($submitted_data['slug'])) $errors[] = "Slug is required.";
-    // ...
+    if (!is_numeric($submitted_data['price'])) $errors[] = "Valid price is required.";
+    if (!is_numeric($submitted_data['stock'])) $errors[] = "Valid stock is required.";
 
     if (empty($errors)) {
         // Check for unique slug
@@ -114,12 +112,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $submitted_data['name'], $submitted_data['slug'], $submitted_data['category_id'],
                 $submitted_data['description'], $submitted_data['how_it_works'], $submitted_data['health_benefits_text'],
                 $submitted_data['gauss_strength'], $submitted_data['material_quality_design'], $submitted_data['usage_guide_text'],
-                $submitted_data['price'], $submitted_data['stock'], $image_filename_to_update,
+                $submitted_data['price'], $submitted_data['stock'], $image_filename_for_db,
                 $submitted_data['is_featured'], $submitted_data['is_on_sale'], $submitted_data['sale_price'],
                 $product_id
             );
 
             if ($stmt_update->execute()) {
+                // After successful DB update, delete old image if a new one was uploaded
+                if ($new_image_uploaded && !empty($product_data['image_url_main'])) {
+                    $old_image_path = __DIR__ . '/../../uploads/' . $product_data['image_url_main'];
+                    if (file_exists($old_image_path)) {
+                        unlink($old_image_path);
+                    }
+                }
                 $_SESSION['success_message'] = "Product updated successfully!";
                 header("Location: " . SITE_URL . "admin/products/");
                 exit;
@@ -132,8 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // If there were any errors, merge submitted data back into $product_data for form repopulation
     if (!empty($errors)) {
         $product_data = array_merge($product_data, $submitted_data);
-        // Ensure the image displayed is the one that will be saved (or the original if upload failed)
-        $product_data['image_url_main'] = $image_filename_to_update;
+        $product_data['image_url_main'] = $image_filename_for_db;
     }
 }
 
