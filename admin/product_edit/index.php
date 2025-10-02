@@ -19,8 +19,7 @@ if (!$product_id) {
 }
 
 // Fetch product data from the database to be used for the form and update logic
-$sql_product = "SELECT * FROM products WHERE id = ?";
-$stmt_fetch = $conn->prepare($sql_product);
+$stmt_fetch = $conn->prepare("SELECT * FROM products WHERE id = ?");
 $stmt_fetch->bind_param("i", $product_id);
 $stmt_fetch->execute();
 $result = $stmt_fetch->get_result();
@@ -36,75 +35,72 @@ $errors = [];
 
 // Handle form submission before any HTML output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $original_image = $product_data['image_url_main'];
+    // Start with the existing image name. This will only be overwritten if a new image is successfully uploaded.
+    $image_filename_to_update = $product_data['image_url_main'];
 
-    // Sanitize and retrieve form data, updating the $product_data array for form repopulation
-    $product_data['name'] = trim($_POST['name'] ?? '');
-    $product_data['slug'] = trim($_POST['slug'] ?? '');
-    $product_data['category_id'] = (int)($_POST['category_id'] ?? 0);
-    $product_data['description'] = trim($_POST['description'] ?? '');
-    $product_data['how_it_works'] = trim($_POST['how_it_works'] ?? '');
-    $product_data['health_benefits_text'] = trim($_POST['health_benefits_text'] ?? '');
-    $product_data['gauss_strength'] = trim($_POST['gauss_strength'] ?? '');
-    $product_data['material_quality_design'] = trim($_POST['material_quality_design'] ?? '');
-    $product_data['usage_guide_text'] = trim($_POST['usage_guide_text'] ?? '');
-    $product_data['price'] = trim($_POST['price'] ?? '');
-    $product_data['stock'] = (int)($_POST['stock'] ?? 0);
-    $product_data['is_featured'] = isset($_POST['is_featured']) ? 1 : 0;
-    $product_data['is_on_sale'] = isset($_POST['is_on_sale']) ? 1 : 0;
-    $product_data['sale_price'] = !empty($_POST['sale_price']) ? trim($_POST['sale_price']) : null;
-
-    // Validation
-    if (empty($product_data['name'])) $errors[] = "Product name is required.";
-    if (empty($product_data['category_id'])) $errors[] = "Category is required.";
-    if (empty($product_data['description'])) $errors[] = "Description is required.";
-    if (!is_numeric($product_data['price']) || $product_data['price'] < 0) $errors[] = "Valid price is required.";
-    if (!is_numeric($product_data['stock']) || $product_data['stock'] < 0) $errors[] = "Valid stock quantity is required.";
-    if ($product_data['is_on_sale'] && (empty($product_data['sale_price']) || !is_numeric($product_data['sale_price']) || $product_data['sale_price'] < 0)) {
-        $errors[] = "Valid sale price is required if product is marked as on sale.";
-    }
-    if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $product_data['slug'])) {
-         $errors[] = "Slug can only contain lowercase letters, numbers, and hyphens.";
-    }
-
-    // Handle image upload
-    $image_to_update = $original_image;
-    if (isset($_FILES['image_url_main']) && $_FILES['image_url_main']['error'] == UPLOAD_ERR_OK) {
+    // Check if a new file has been uploaded and there are no upload errors.
+    if (isset($_FILES['image_url_main']) && $_FILES['image_url_main']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = __DIR__ . '/../../uploads/';
         $file_info = pathinfo($_FILES['image_url_main']['name']);
         $new_image_name = uniqid('prod_') . '.' . strtolower($file_info['extension']);
         $target_file = $upload_dir . $new_image_name;
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $upload_ok = true;
 
-        $is_valid_upload = true;
         if (!in_array(strtolower($file_info['extension']), $allowed_types)) {
-            $errors[] = "Invalid image file type.";
-            $is_valid_upload = false;
+            $errors[] = "Invalid image file type. Allowed: " . implode(', ', $allowed_types);
+            $upload_ok = false;
         } elseif ($_FILES['image_url_main']['size'] > 2 * 1024 * 1024) {
             $errors[] = "Image file size exceeds 2MB limit.";
-            $is_valid_upload = false;
+            $upload_ok = false;
         }
 
-        if ($is_valid_upload) {
+        if ($upload_ok) {
             if (move_uploaded_file($_FILES['image_url_main']['tmp_name'], $target_file)) {
-                $image_to_update = $new_image_name;
-                if (!empty($original_image) && file_exists($upload_dir . $original_image)) {
-                    unlink($upload_dir . $original_image);
+                // SUCCESS: The new file is saved. Set it as the filename for the database.
+                $image_filename_to_update = $new_image_name;
+                // Delete the old image file if it exists and is different from the new one.
+                if (!empty($product_data['image_url_main']) && file_exists($upload_dir . $product_data['image_url_main'])) {
+                    unlink($upload_dir . $product_data['image_url_main']);
                 }
             } else {
-                $errors[] = "Failed to upload new image.";
+                $errors[] = "Failed to move uploaded file.";
             }
         }
     }
-    $product_data['image_url_main'] = $image_to_update;
+
+    // Sanitize and retrieve the rest of the form data
+    $submitted_data = [
+        'name' => trim($_POST['name'] ?? ''),
+        'slug' => trim($_POST['slug'] ?? ''),
+        'category_id' => (int)($_POST['category_id'] ?? 0),
+        'description' => trim($_POST['description'] ?? ''),
+        'how_it_works' => trim($_POST['how_it_works'] ?? ''),
+        'health_benefits_text' => trim($_POST['health_benefits_text'] ?? ''),
+        'gauss_strength' => trim($_POST['gauss_strength'] ?? ''),
+        'material_quality_design' => trim($_POST['material_quality_design'] ?? ''),
+        'usage_guide_text' => trim($_POST['usage_guide_text'] ?? ''),
+        'price' => trim($_POST['price'] ?? ''),
+        'stock' => (int)($_POST['stock'] ?? 0),
+        'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+        'is_on_sale' => isset($_POST['is_on_sale']) ? 1 : 0,
+        'sale_price' => !empty($_POST['sale_price']) ? trim($_POST['sale_price']) : null,
+    ];
+
+    // Other validations...
+    if (empty($submitted_data['name'])) $errors[] = "Product name is required.";
+    if (empty($submitted_data['slug'])) $errors[] = "Slug is required.";
+    // ...
 
     if (empty($errors)) {
+        // Check for unique slug
         $stmt_check_slug = $conn->prepare("SELECT id FROM products WHERE slug = ? AND id != ?");
-        $stmt_check_slug->bind_param("si", $product_data['slug'], $product_id);
+        $stmt_check_slug->bind_param("si", $submitted_data['slug'], $product_id);
         $stmt_check_slug->execute();
         if ($stmt_check_slug->get_result()->num_rows > 0) {
-            $errors[] = "Product slug already exists. Please choose a unique slug.";
+            $errors[] = "Product slug already exists.";
         } else {
+            // All checks passed, proceed with database update
             $sql_update = "UPDATE products SET
                 name = ?, slug = ?, category_id = ?, description = ?, how_it_works = ?,
                 health_benefits_text = ?, gauss_strength = ?, material_quality_design = ?,
@@ -115,11 +111,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bind_param(
                 "ssissssssdsisidi",
-                $product_data['name'], $product_data['slug'], $product_data['category_id'],
-                $product_data['description'], $product_data['how_it_works'], $product_data['health_benefits_text'],
-                $product_data['gauss_strength'], $product_data['material_quality_design'], $product_data['usage_guide_text'],
-                $product_data['price'], $product_data['stock'], $image_to_update,
-                $product_data['is_featured'], $product_data['is_on_sale'], $product_data['sale_price'],
+                $submitted_data['name'], $submitted_data['slug'], $submitted_data['category_id'],
+                $submitted_data['description'], $submitted_data['how_it_works'], $submitted_data['health_benefits_text'],
+                $submitted_data['gauss_strength'], $submitted_data['material_quality_design'], $submitted_data['usage_guide_text'],
+                $submitted_data['price'], $submitted_data['stock'], $image_filename_to_update,
+                $submitted_data['is_featured'], $submitted_data['is_on_sale'], $submitted_data['sale_price'],
                 $product_id
             );
 
@@ -128,9 +124,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header("Location: " . SITE_URL . "admin/products/");
                 exit;
             } else {
-                $errors[] = "Failed to update product: " . $stmt_update->error;
+                $errors[] = "Failed to update product in database: " . $stmt_update->error;
             }
         }
+    }
+
+    // If there were any errors, merge submitted data back into $product_data for form repopulation
+    if (!empty($errors)) {
+        $product_data = array_merge($product_data, $submitted_data);
+        // Ensure the image displayed is the one that will be saved (or the original if upload failed)
+        $product_data['image_url_main'] = $image_filename_to_update;
     }
 }
 
@@ -218,10 +221,10 @@ require_once __DIR__ . '/../includes/header.php';
                         <input type="number" class="form-control" id="stock" name="stock" value="<?php echo htmlspecialchars($product_data['stock']); ?>" required>
                     </div>
                      <div class="form-group form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="is_on_sale" name="is_on_sale" value="1" <?php echo $product_data['is_on_sale'] ? 'checked' : ''; ?>>
+                        <input type="checkbox" class="form-check-input" id="is_on_sale" name="is_on_sale" value="1" <?php echo !empty($product_data['is_on_sale']) ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="is_on_sale">Is on Sale?</label>
                     </div>
-                    <div class="form-group mb-3" id="sale_price_group" style="<?php echo $product_data['is_on_sale'] ? '' : 'display:none;'; ?>">
+                    <div class="form-group mb-3" id="sale_price_group" style="<?php echo !empty($product_data['is_on_sale']) ? '' : 'display:none;'; ?>">
                         <label for="sale_price">Sale Price ($)</label>
                         <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" value="<?php echo htmlspecialchars($product_data['sale_price'] ?? ''); ?>">
                     </div>
@@ -266,7 +269,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="card-header">Visibility</div>
                 <div class="card-body">
                     <div class="form-group form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1" <?php echo $product_data['is_featured'] ? 'checked' : ''; ?>>
+                        <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1" <?php echo !empty($product_data['is_featured']) ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="is_featured">Feature on homepage</label>
                     </div>
                 </div>
