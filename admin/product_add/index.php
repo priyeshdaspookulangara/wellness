@@ -118,6 +118,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            VALUES ('$name_esc', '$slug_esc', $category_id_esc, '$desc_esc', '$how_it_works_esc', '$health_benefits_esc', '$gauss_esc', '$material_esc', '$usage_esc', $price_esc, $stock_esc, $image_file_name_esc, $is_featured_esc, $is_on_sale_esc, $sale_price_esc, NOW(), NOW())";
 
             if (mysqli_query($conn, $sql_insert)) {
+                $new_product_id = mysqli_insert_id($conn);
+
+                // Handle additional images upload
+                if (isset($_FILES['additional_images']) && !empty($_FILES['additional_images']['name'][0])) {
+                    $upload_dir = __DIR__ . '/../../uploads/';
+                    $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+                    foreach ($_FILES['additional_images']['name'] as $key => $name) {
+                        if ($_FILES['additional_images']['error'][$key] == UPLOAD_ERR_OK) {
+                            $file_info = pathinfo($name);
+                            $additional_image_name = uniqid('prod_add_') . '.' . strtolower($file_info['extension']);
+                            $target_file = $upload_dir . $additional_image_name;
+
+                            // Basic validation for each additional image
+                            if (in_array(strtolower($file_info['extension']), $allowed_types) && $_FILES['additional_images']['size'][$key] <= 2 * 1024 * 1024) {
+                                if (move_uploaded_file($_FILES['additional_images']['tmp_name'][$key], $target_file)) {
+                                    $image_url_esc = escape_string($additional_image_name);
+                                    $sql_insert_add_image = "INSERT INTO product_images (product_id, image_url) VALUES ($new_product_id, '$image_url_esc')";
+                                    mysqli_query($conn, $sql_insert_add_image);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 $_SESSION['success_message'] = "Product added successfully!";
                 header("Location: " . SITE_URL . "admin/products/"); // Corrected redirect
                 exit;
@@ -233,8 +258,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body">
                     <div class="form-group mb-3">
                         <label for="image_url_main">Main Product Image</label>
-                        <input type="file" class="form-control" id="image_url_main" name="image_url_main"> <!-- BS5 uses form-control for file inputs -->
+                        <input type="file" class="form-control" id="image_url_main" name="image_url_main">
                         <small class="form-text text-muted">Max 2MB. Allowed types: JPG, PNG, GIF, WEBP.</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="additional_images">Additional Images</label>
+                        <input type="file" class="form-control" id="additional_images" name="additional_images[]" multiple>
+                        <small class="form-text text-muted">You can select multiple images.</small>
                     </div>
                 </div>
             </div>

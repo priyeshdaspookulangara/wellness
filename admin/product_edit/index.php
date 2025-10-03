@@ -118,6 +118,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             if ($stmt_update->execute()) {
+                // Handle additional images upload after main product is updated
+                if (isset($_FILES['additional_images']) && !empty($_FILES['additional_images']['name'][0])) {
+                    $upload_dir = __DIR__ . '/../../uploads/';
+                    $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+                    foreach ($_FILES['additional_images']['name'] as $key => $name) {
+                        if ($_FILES['additional_images']['error'][$key] == UPLOAD_ERR_OK) {
+                            $file_info = pathinfo($name);
+                            $additional_image_name = uniqid('prod_add_') . '.' . strtolower($file_info['extension']);
+                            $target_file = $upload_dir . $additional_image_name;
+
+                            if (in_array(strtolower($file_info['extension']), $allowed_types) && $_FILES['additional_images']['size'][$key] <= 2 * 1024 * 1024) {
+                                if (move_uploaded_file($_FILES['additional_images']['tmp_name'][$key], $target_file)) {
+                                    $stmt_insert_add = $conn->prepare("INSERT INTO product_images (product_id, image_url) VALUES (?, ?)");
+                                    $stmt_insert_add->bind_param("is", $product_id, $additional_image_name);
+                                    $stmt_insert_add->execute();
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // After successful DB update, delete old image if a new one was uploaded
                 if ($new_image_uploaded && !empty($product_data['image_url_main'])) {
                     $old_image_path = __DIR__ . '/../../uploads/' . $product_data['image_url_main'];
@@ -149,6 +171,17 @@ if ($result_categories) {
     while ($row = mysqli_fetch_assoc($result_categories)) {
         $categories[] = $row;
     }
+}
+
+// Fetch additional images
+$sql_images = "SELECT id, image_url FROM product_images WHERE product_id = ?";
+$stmt_images = $conn->prepare($sql_images);
+$stmt_images->bind_param("i", $product_id);
+$stmt_images->execute();
+$result_images = $stmt_images->get_result();
+$additional_images = [];
+while ($row = $result_images->fetch_assoc()) {
+    $additional_images[] = $row;
 }
 
 $page_title = "Edit Product";
@@ -267,6 +300,23 @@ require_once __DIR__ . '/../includes/header.php';
                             </div>
                         <?php endif; ?>
                     </div>
+                    <hr>
+                    <div class="form-group mb-3">
+                        <label>Additional Images</label>
+                        <div id="additional-images-gallery" class="row">
+                            <?php foreach ($additional_images as $image): ?>
+                            <div class="col-md-4 mb-3" id="image-<?php echo $image['id']; ?>">
+                                <img src="<?php echo SITE_URL . 'uploads/' . htmlspecialchars($image['image_url']); ?>" class="img-thumbnail" alt="Additional Image">
+                                <button type="button" class="btn btn-sm btn-danger delete-image-btn" data-image-id="<?php echo $image['id']; ?>">Delete</button>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="additional_images">Upload More Images</label>
+                        <input type="file" class="form-control" id="additional_images" name="additional_images[]" multiple>
+                        <small class="form-text text-muted">You can select multiple images.</small>
+                    </div>
                 </div>
             </div>
              <div class="card mb-3">
@@ -292,6 +342,31 @@ $(document).ready(function(){
             $('#sale_price_group').hide();
             $('#sale_price').val('');
         }
+    });
+
+    $('.delete-image-btn').on('click', function() {
+        if (!confirm('Are you sure you want to delete this image?')) {
+            return;
+        }
+        var button = $(this);
+        var imageId = button.data('image-id');
+
+        $.ajax({
+            url: 'delete_image.php',
+            type: 'POST',
+            data: { image_id: imageId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#image-' + imageId).remove();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('An error occurred while communicating with the server.');
+            }
+        });
     });
 });
 </script>

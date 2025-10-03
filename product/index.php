@@ -55,6 +55,17 @@ if ($user_id) {
     }
 }
 
+// Fetch additional images
+$sql_images = "SELECT image_url FROM product_images WHERE product_id = ?";
+$stmt_images = $conn->prepare($sql_images);
+$stmt_images->bind_param("i", $product['id']);
+$stmt_images->execute();
+$result_images = $stmt_images->get_result();
+$additional_images = [];
+while ($row = $result_images->fetch_assoc()) {
+    $additional_images[] = $row;
+}
+
 require_once __DIR__ . '/../templates/header.php';
 ?>
 
@@ -88,6 +99,23 @@ require_once __DIR__ . '/../templates/header.php';
             </div>
         </div>
     </div>
+
+    <?php if (!empty($additional_images)): ?>
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="mb-3">More Images</h4>
+            <div class="row">
+                <?php foreach ($additional_images as $image): ?>
+                <div class="col-lg-3 col-md-4 col-6 mb-3">
+                    <a href="<?php echo SITE_URL . 'uploads/' . htmlspecialchars($image['image_url']); ?>" target="_blank">
+                        <img src="<?php echo SITE_URL . 'uploads/' . htmlspecialchars($image['image_url']); ?>" class="img-fluid img-thumbnail" alt="Additional product image">
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <?php
