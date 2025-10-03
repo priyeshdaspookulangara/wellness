@@ -61,12 +61,13 @@ if ($active_section == 'index.php') $active_section = 'dashboard';
             </li>
 
             <li class="nav-item">
-                <a href="#contentSubmenu" data-bs-toggle="collapse" aria-expanded="<?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? 'true' : 'false'; ?>" class="nav-link dropdown-toggle <?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? '' : 'collapsed'; ?>">
+                <a href="#contentSubmenu" data-bs-toggle="collapse" aria-expanded="<?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit', 'landing_pages']) ? 'true' : 'false'; ?>" class="nav-link dropdown-toggle <?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit', 'landing_pages']) ? '' : 'collapsed'; ?>">
                     <i class="fas fa-file-alt"></i> Content
                 </a>
-                <ul class="collapse list-unstyled <?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? 'show' : ''; ?>" id="contentSubmenu" data-bs-parent="#sidebarAccordion">
+                <ul class="collapse list-unstyled <?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit', 'landing_pages']) ? 'show' : ''; ?>" id="contentSubmenu" data-bs-parent="#sidebarAccordion">
                     <li><a class="nav-link <?php echo ($active_section == 'blog_posts') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/blog_posts/">Blog Posts</a></li>
                     <li><a class="nav-link <?php echo ($active_section == 'testimonials') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/testimonials/">Testimonials</a></li>
+                    <li><a class="nav-link <?php echo ($active_section == 'landing_pages') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/landing_pages/">Landing Pages</a></li>
                     <li><a class="nav-link <?php echo ($active_section == 'content_edit' && ($_GET['page'] ?? '') == 'about') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/content_edit/?page=about">About Us Page</a></li>
                 </ul>
             </li>

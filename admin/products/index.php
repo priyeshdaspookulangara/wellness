@@ -14,9 +14,11 @@ $page_title = "Manage Products";
 require_once __DIR__ . '/../includes/header.php'; // Corrected
 
 // Fetch products from database
-$sql_products = "SELECT p.id, p.name, p.price, p.stock, p.is_featured, p.is_on_sale, c.name as category_name, p.image_url_main
+$sql_products = "SELECT p.id, p.name, p.price, p.stock, p.is_featured, p.is_on_sale, c.name as category_name, p.image_url_main, COUNT(pl.id) as like_count
                  FROM products p
                  LEFT JOIN categories c ON p.category_id = c.id
+                 LEFT JOIN product_likes pl ON p.id = pl.product_id
+                 GROUP BY p.id
                  ORDER BY p.created_at DESC";
 $result_products = mysqli_query($conn, $sql_products);
 $products = [];
@@ -62,6 +64,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                 <th>Category</th>
                 <th>Price</th>
                 <th>Stock</th>
+                <th>Likes</th>
                 <th>Featured</th>
                 <th>On Sale</th>
                 <th>Actions</th>
@@ -83,6 +86,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                         <td><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></td>
                         <td>$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
                         <td><?php echo htmlspecialchars($product['stock']); ?></td>
+                        <td><?php echo htmlspecialchars($product['like_count']); ?></td>
                         <td><?php echo $product['is_featured'] ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>'; ?></td>
                         <td><?php echo $product['is_on_sale'] ? '<span class="badge bg-warning text-dark">Yes</span>' : '<span class="badge bg-secondary">No</span>'; ?></td>
                         <td class="action-buttons">
@@ -93,7 +97,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="9" class="text-center">No products found.</td>
+                    <td colspan="10" class="text-center">No products found.</td>
                 </tr>
             <?php endif; ?>
         </tbody>
