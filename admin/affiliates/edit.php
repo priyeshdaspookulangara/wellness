@@ -18,7 +18,7 @@ if (!$affiliate_id) {
 
 $db = db_connect();
 
-// Fetch affiliate data
+// Fetch affiliate data first, as it's needed for both POST handling and form display
 $sql_affiliate = "
     SELECT a.id, a.referral_code, a.status, u.name, u.email
     FROM affiliates a
@@ -35,16 +35,10 @@ if (!$affiliate) {
     exit;
 }
 
-$page_title = "Edit Affiliate";
-$breadcrumbs = [
-    ['name' => 'Affiliates', 'url' => SITE_URL . 'admin/affiliates/'],
-    ['name' => 'Edit Affiliate']
-];
-require_once __DIR__ . '/../includes/header.php';
-
 $error_message = '';
 $success_message = '';
 
+// Handle form submission before any HTML output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = $_POST['status'] ?? 'inactive';
     $referral_code = $_POST['referral_code'] ?? $affiliate['referral_code'];
@@ -75,6 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+
+$page_title = "Edit Affiliate";
+$breadcrumbs = [
+    ['name' => 'Affiliates', 'url' => SITE_URL . 'admin/affiliates/'],
+    ['name' => 'Edit Affiliate']
+];
+require_once __DIR__ . '/../includes/header.php';
 
 ?>
 

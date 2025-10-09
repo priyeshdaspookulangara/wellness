@@ -10,23 +10,11 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || !$_SESSION[
     exit;
 }
 
-$page_title = "Add New Affiliate";
-$breadcrumbs = [
-    ['name' => 'Affiliates', 'url' => SITE_URL . 'admin/affiliates/'],
-    ['name' => 'Add New Affiliate']
-];
-require_once __DIR__ . '/../includes/header.php';
-
-// Fetch users who are not already affiliates
 $db = db_connect();
-$sql_users = "SELECT id, name, email FROM users WHERE id NOT IN (SELECT user_id FROM affiliates)";
-$stmt_users = $db->prepare($sql_users);
-$stmt_users->execute();
-$users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
-
 $error_message = '';
 $success_message = '';
 
+// Handle form submission before any HTML output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_POST['user_id'] ?? null;
     $referral_code = $_POST['referral_code'] ?? uniqid('ref_');
@@ -53,6 +41,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+
+$page_title = "Add New Affiliate";
+$breadcrumbs = [
+    ['name' => 'Affiliates', 'url' => SITE_URL . 'admin/affiliates/'],
+    ['name' => 'Add New Affiliate']
+];
+require_once __DIR__ . '/../includes/header.php';
+
+// Fetch users who are not already affiliates
+$sql_users = "SELECT id, name, email FROM users WHERE id NOT IN (SELECT user_id FROM affiliates)";
+$stmt_users = $db->prepare($sql_users);
+$stmt_users->execute();
+$users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
