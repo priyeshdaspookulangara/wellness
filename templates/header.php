@@ -1,4 +1,12 @@
 <?php
+// Affiliate referral tracking
+if (isset($_GET['ref'])) {
+    $referral_code = trim($_GET['ref']);
+    // Store the referral code in a cookie for 30 days
+    // The path is set to '/' to make the cookie available across the entire domain
+    setcookie('affiliate_ref', $referral_code, time() + (86400 * 30), "/"); // 86400 = 1 day
+}
+
 // Determine the base path of the project
 $basePath = rtrim(str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']), '/');
 ?>
