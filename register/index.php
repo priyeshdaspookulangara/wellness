@@ -58,11 +58,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($errors)) {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $sql_insert_user = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-        $stmt_insert_user = $db->prepare($sql_insert_user);
-
-        if ($stmt_insert_user->execute([$name, $email, $hashed_password])) {
+        $db->beginTransaction();
+        try {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $sql_insert_user = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+            $stmt_insert_user = $db->prepare($sql_insert_user);
+            $stmt_insert_user->execute([$name, $email, $hashed_password]);
             $new_user_id = $db->lastInsertId();
 
             if ($affiliate_id) {
@@ -71,15 +72,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt_insert_referral->execute([$affiliate_id, $new_user_id]);
             }
 
+            // Check if user wants to register as an affiliate
+            if (isset($_POST['is_affiliate']) && $_POST['is_affiliate'] == '1') {
+                $new_referral_code = 'ref_' . uniqid() . $new_user_id;
+                $sql_insert_affiliate = "INSERT INTO affiliates (user_id, referral_code, status) VALUES (?, ?, 'inactive')";
+                $stmt_insert_affiliate = $db->prepare($sql_insert_affiliate);
+                $stmt_insert_affiliate->execute([$new_user_id, $new_referral_code]);
+                $_SESSION['message'] = "Registration successful! Your affiliate application has been submitted for review.";
+            } else {
+                $_SESSION['message'] = "Registration successful! You can now log in.";
+            }
+
+            $db->commit();
+
             // Clear the cookie after successful registration
             setcookie('affiliate_ref', '', time() - 3600, "/");
 
-            $_SESSION['message'] = "Registration successful! You can now log in.";
             $_SESSION['message_type'] = "success";
             header("location: " . SITE_URL . "login/");
             exit;
-        } else {
-            $errors[] = "Something went wrong. Please try again later.";
+        } catch (Exception $e) {
+            $db->rollBack();
+            $errors[] = "Something went wrong. Please try again later. " . $e->getMessage();
         }
     }
 }
@@ -121,6 +135,10 @@ include_once '../templates/header.php';
                         <div class="form-group mb-3">
                             <label for="referral_code">Referral Code (Optional)</label>
                             <input type="text" name="referral_code" id="referral_code" class="form-control" value="<?php echo htmlspecialchars($referral_code); ?>">
+                        </div>
+                        <div class="form-group form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="is_affiliate" name="is_affiliate" value="1">
+                            <label class="form-check-label" for="is_affiliate">I want to register as an affiliate</label>
                         </div>
                         <div class="form-group">
                             <input type="submit" class="btn btn-primary" value="Register">
