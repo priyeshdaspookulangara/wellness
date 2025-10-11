@@ -85,6 +85,9 @@ if ($active_section == 'index.php') $active_section = 'dashboard';
                     <li><a class="nav-link <?php echo ($active_section == 'reports_customers') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/reports_customers/">Customer Reports</a></li>
                 </ul>
             </li>
+            <li class="nav-item <?php echo ($active_section == 'settings') ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?php echo SITE_URL; ?>admin/settings/"><i class="fas fa-cog"></i> Settings</a>
+            </li>
             <hr class="sidebar-divider">
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo SITE_URL; ?>logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
