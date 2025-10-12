@@ -105,6 +105,7 @@ include_once '../../templates/header.php';
                         <div class="card-body">
                             <p><strong>Order Date:</strong> <?php echo htmlspecialchars(date("F j, Y", strtotime($order['order_date']))); ?></p>
                             <p><strong>Status:</strong> <?php echo htmlspecialchars(ucfirst($order['status'])); ?></p>
+                            <p><strong>Payment Method:</strong> <?php echo isset($order['payment_method']) ? htmlspecialchars(ucfirst($order['payment_method'])) : 'N/A'; ?></p>
                             <p class="h5"><strong>Total:</strong> $<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></p>
                         </div>
                     </div>

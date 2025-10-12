@@ -29,7 +29,7 @@ $sql_order = "SELECT o.*, u.username AS user_username
               FROM orders o
               LEFT JOIN users u ON o.user_id = u.id
               WHERE o.id = $order_id";
-$result_order = mysqli_query($conn, $sql_order);
+$result_order = mysqli_query($conn, "SELECT o.*, u.username AS user_username, u.email as user_email, a.address_line1, a.address_line2, a.city, a.state, a.postal_code, a.country, o.payment_method FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN addresses a ON o.address_id = a.id WHERE o.id = {$order_id}");
 
 if (!$result_order || mysqli_num_rows($result_order) === 0) {
     echo "<div class='alert alert-danger'>Order not found.</div>";

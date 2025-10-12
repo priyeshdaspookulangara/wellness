@@ -59,8 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db->beginTransaction();
 
         // 1. Create order
-        $stmt_order = $db->prepare("INSERT INTO orders (user_id, address_id, total_amount, status) VALUES (?, ?, ?, 'completed')");
-        $stmt_order->execute([$user_id, $address_id, $total_amount]);
+        $payment_method = $_POST['payment_method'] ?? 'cod';
+        $order_status = ($payment_method === 'cod') ? 'processing' : 'completed';
+
+        $stmt_order = $db->prepare("INSERT INTO orders (user_id, address_id, total_amount, status, payment_method) VALUES (?, ?, ?, ?, ?)");
+        $stmt_order->execute([$user_id, $address_id, $total_amount, $order_status, $payment_method]);
         $order_id = $db->lastInsertId();
 
         // 2. Create order items
@@ -155,6 +158,15 @@ include_once '../templates/header.php';
                             </div>
                         </div>
                     <?php endforeach; ?>
+
+                    <h4 class="mt-4">Payment Method</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <input type="radio" name="payment_method" value="cod" id="payment_cod" checked>
+                            <label for="payment_cod">Cash on Delivery</label>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary btn-lg mt-3">Place Order</button>
                 </form>
             <?php endif; ?>
