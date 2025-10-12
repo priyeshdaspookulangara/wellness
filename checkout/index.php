@@ -128,7 +128,7 @@ $addresses = $stmt_addr->fetchAll(PDO::FETCH_ASSOC);
 // Fetch cart item details
 $product_ids_cart = array_keys($cart);
 $placeholders_cart = implode(',', array_fill(0, count($product_ids_cart), '?'));
-$stmt_cart_items = $db->prepare("SELECT id, name, price, image FROM products WHERE id IN ($placeholders_cart)");
+$stmt_cart_items = $db->prepare("SELECT id, name, price, image_url_main as image FROM products WHERE id IN ($placeholders_cart)");
 $stmt_cart_items->execute($product_ids_cart);
 $products_in_cart = $stmt_cart_items->fetchAll(PDO::FETCH_ASSOC);
 
