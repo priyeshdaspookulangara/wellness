@@ -146,7 +146,7 @@ include_once '../templates/header.php';
                     You have no saved addresses. Please <a href="<?php echo SITE_URL; ?>account/add_address/">add an address</a> before proceeding.
                 </div>
             <?php else: ?>
-                <form action="" method="POST">
+                <form action="<?php echo SITE_URL; ?>checkout/index.php" method="POST">
                     <?php foreach ($addresses as $address): ?>
                         <div class="card mb-3">
                             <div class="card-body">
