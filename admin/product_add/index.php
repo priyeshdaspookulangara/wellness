@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_data['stock'] = (int)($_POST['stock'] ?? 0);
     $product_data['is_featured'] = isset($_POST['is_featured']) ? 1 : 0;
     $product_data['is_on_sale'] = isset($_POST['is_on_sale']) ? 1 : 0;
+    $product_data['is_cod_available'] = isset($_POST['is_cod_available']) ? 1 : 0;
     $product_data['sale_price'] = !empty($_POST['sale_price']) ? trim($_POST['sale_price']) : null;
 
     // Validation (same as before)
@@ -106,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $category_id_esc = (int)$product_data['category_id'];
         $is_featured_esc = (int)$product_data['is_featured'];
         $is_on_sale_esc = (int)$product_data['is_on_sale'];
+        $is_cod_available_esc = (int)$product_data['is_cod_available'];
         $sale_price_esc = $product_data['is_on_sale'] && !empty($product_data['sale_price']) ? (float)$product_data['sale_price'] : 'NULL';
         $image_file_name_esc = $image_file_name ? "'" . escape_string($image_file_name) . "'" : 'NULL';
 
@@ -114,8 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_num_rows($res_slug) > 0) {
             $errors[] = "Product slug already exists. Please choose a unique slug.";
         } else {
-            $sql_insert = "INSERT INTO products (name, slug, category_id, description, how_it_works, health_benefits_text, gauss_strength, material_quality_design, usage_guide_text, price, stock, image_url_main, is_featured, is_on_sale, sale_price, created_at, updated_at)
-                           VALUES ('$name_esc', '$slug_esc', $category_id_esc, '$desc_esc', '$how_it_works_esc', '$health_benefits_esc', '$gauss_esc', '$material_esc', '$usage_esc', $price_esc, $stock_esc, $image_file_name_esc, $is_featured_esc, $is_on_sale_esc, $sale_price_esc, NOW(), NOW())";
+            $sql_insert = "INSERT INTO products (name, slug, category_id, description, how_it_works, health_benefits_text, gauss_strength, material_quality_design, usage_guide_text, price, stock, image_url_main, is_featured, is_on_sale, is_cod_available, sale_price, created_at, updated_at)
+                           VALUES ('$name_esc', '$slug_esc', $category_id_esc, '$desc_esc', '$how_it_works_esc', '$health_benefits_esc', '$gauss_esc', '$material_esc', '$usage_esc', $price_esc, $stock_esc, $image_file_name_esc, $is_featured_esc, $is_on_sale_esc, $is_cod_available_esc, $sale_price_esc, NOW(), NOW())";
 
             if (mysqli_query($conn, $sql_insert)) {
                 $_SESSION['success_message'] = "Product added successfully!";
@@ -201,6 +203,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      <div class="form-group form-check mb-3">
                         <input type="checkbox" class="form-check-input" id="is_on_sale" name="is_on_sale" value="1" <?php echo $product_data['is_on_sale'] ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="is_on_sale">Is on Sale?</label>
+                    </div>
+                    <div class="form-group form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="is_cod_available" name="is_cod_available" value="1" checked>
+                        <label class="form-check-label" for="is_cod_available">Pay on Delivery</label>
                     </div>
                     <div class="form-group mb-3" id="sale_price_group" style="<?php echo $product_data['is_on_sale'] ? '' : 'display:none;'; ?>">
                         <label for="sale_price">Sale Price ($)</label>

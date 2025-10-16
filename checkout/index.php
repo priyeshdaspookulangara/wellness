@@ -128,9 +128,17 @@ $addresses = $stmt_addr->fetchAll(PDO::FETCH_ASSOC);
 // Fetch cart item details
 $product_ids_cart = array_keys($cart);
 $placeholders_cart = implode(',', array_fill(0, count($product_ids_cart), '?'));
-$stmt_cart_items = $db->prepare("SELECT id, name, price, image_url_main as image FROM products WHERE id IN ($placeholders_cart)");
+$stmt_cart_items = $db->prepare("SELECT id, name, price, image_url_main as image, is_cod_available FROM products WHERE id IN ($placeholders_cart)");
 $stmt_cart_items->execute($product_ids_cart);
 $products_in_cart = $stmt_cart_items->fetchAll(PDO::FETCH_ASSOC);
+
+$all_items_cod_available = true;
+foreach ($products_in_cart as $product) {
+    if (!$product['is_cod_available']) {
+        $all_items_cod_available = false;
+        break;
+    }
+}
 
 $pageTitle = "Checkout";
 include_once '../templates/header.php';
@@ -159,15 +167,20 @@ include_once '../templates/header.php';
                         </div>
                     <?php endforeach; ?>
 
-                    <h4 class="mt-4">Payment Method</h4>
-                    <div class="card">
-                        <div class="card-body">
-                            <input type="radio" name="payment_method" value="cod" id="payment_cod" checked>
-                            <label for="payment_cod">Cash on Delivery</label>
+                    <?php if ($all_items_cod_available): ?>
+                        <h4 class="mt-4">Payment Method</h4>
+                        <div class="card">
+                            <div class="card-body">
+                                <input type="radio" name="payment_method" value="cod" id="payment_cod" checked>
+                                <label for="payment_cod">Cash on Delivery</label>
+                            </div>
                         </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-lg mt-3">Place Order</button>
+                        <button type="submit" class="btn btn-primary btn-lg mt-3">Place Order</button>
+                    <?php else: ?>
+                        <div class="alert alert-warning mt-4">
+                            One or more items in your cart are not eligible for Cash on Delivery. Please remove them to use this payment method.
+                        </div>
+                    <?php endif; ?>
                 </form>
             <?php endif; ?>
         </div>
