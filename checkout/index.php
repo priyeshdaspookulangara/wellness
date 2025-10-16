@@ -93,9 +93,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_commission->execute([$affiliate_id, $order_id, $commission_amount]);
         }
 
+        // 4. Send confirmation email
+        $stmt_customer = $db->prepare("SELECT name, email FROM users WHERE id = ?");
+        $stmt_customer->execute([$user_id]);
+        $customer = $stmt_customer->fetch(PDO::FETCH_ASSOC);
+        $customer_name = $customer['name'];
+
+        $stmt_order_details = $db->prepare("SELECT * FROM orders WHERE id = ?");
+        $stmt_order_details->execute([$order_id]);
+        $order = $stmt_order_details->fetch(PDO::FETCH_ASSOC);
+
+        $stmt_order_items = $db->prepare("SELECT oi.quantity, oi.price, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
+        $stmt_order_items->execute([$order_id]);
+        $order_items = $stmt_order_items->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt_address = $db->prepare("SELECT * FROM addresses WHERE id = ?");
+        $stmt_address->execute([$address_id]);
+        $shipping_address = $stmt_address->fetch(PDO::FETCH_ASSOC);
+
+        ob_start();
+        include BASE_PATH . 'templates/emails/order_confirmation.php';
+        $email_body = ob_get_clean();
+
+        $to = $customer['email'];
+        $subject = "Order Confirmation - #" . $order_id;
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+        $headers .= 'From: <' . ADMIN_EMAIL . '>' . "\r\n";
+
+        mail($to, $subject, $email_body, $headers);
+
         $db->commit();
 
-        // 4. Clear cart and redirect to success page
+        // 5. Clear cart and redirect to success page
         unset($_SESSION['cart']);
         $_SESSION['order_id'] = $order_id;
         header('Location: ' . SITE_URL . 'order_success/');
