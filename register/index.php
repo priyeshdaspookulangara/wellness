@@ -23,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = trim($_POST["password"]);
     // Overwrite with POST data if form was submitted
     $referral_code = trim($_POST["referral_code"]);
+    $is_affiliate_request = isset($_POST['is_affiliate']) && $_POST['is_affiliate'] == '1';
 
     if (empty($name)) {
         $errors[] = "Please enter your name.";
@@ -34,23 +35,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors[] = "Password must be at least 6 characters long.";
     }
 
-    $db = db_connect();
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
     // Check if email already exists
-    $sql_check_email = "SELECT id FROM users WHERE email = ?";
-    $stmt_check_email = $db->prepare($sql_check_email);
-    $stmt_check_email->execute([$email]);
-    if ($stmt_check_email->fetch()) {
+    $stmt_check_email = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt_check_email->bind_param("s", $email);
+    $stmt_check_email->execute();
+    $result_check_email = $stmt_check_email->get_result();
+    if ($result_check_email->num_rows > 0) {
         $errors[] = "An account with this email address already exists.";
     }
 
     $affiliate_id = null;
     if (!empty($referral_code)) {
-        $sql_check_code = "SELECT id FROM affiliates WHERE referral_code = ? AND status = 'active'";
-        $stmt_check_code = $db->prepare($sql_check_code);
-        $stmt_check_code->execute([$referral_code]);
-        $affiliate = $stmt_check_code->fetch(PDO::FETCH_ASSOC);
-        if ($affiliate) {
+        $stmt_check_code = $conn->prepare("SELECT id FROM affiliates WHERE referral_code = ? AND status = 'active'");
+        $stmt_check_code->bind_param("s", $referral_code);
+        $stmt_check_code->execute();
+        $result_check_code = $stmt_check_code->get_result();
+        if ($result_check_code->num_rows > 0) {
+            $affiliate = $result_check_code->fetch_assoc();
             $affiliate_id = $affiliate['id'];
         } else {
             $errors[] = "The provided referral code is not valid.";
@@ -58,32 +64,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($errors)) {
-        $db->beginTransaction();
+        $conn->begin_transaction();
         try {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $sql_insert_user = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-            $stmt_insert_user = $db->prepare($sql_insert_user);
-            $stmt_insert_user->execute([$name, $email, $hashed_password]);
-            $new_user_id = $db->lastInsertId();
+            $stmt_insert_user = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $stmt_insert_user->bind_param("sss", $name, $email, $hashed_password);
+            $stmt_insert_user->execute();
+            $new_user_id = $conn->insert_id;
 
             if ($affiliate_id) {
-                $sql_insert_referral = "INSERT INTO referrals (affiliate_id, referred_user_id) VALUES (?, ?)";
-                $stmt_insert_referral = $db->prepare($sql_insert_referral);
-                $stmt_insert_referral->execute([$affiliate_id, $new_user_id]);
+                $stmt_insert_referral = $conn->prepare("INSERT INTO referrals (affiliate_id, referred_user_id) VALUES (?, ?)");
+                $stmt_insert_referral->bind_param("ii", $affiliate_id, $new_user_id);
+                $stmt_insert_referral->execute();
             }
 
             // Check if user wants to register as an affiliate
-            if (isset($_POST['is_affiliate']) && $_POST['is_affiliate'] == '1') {
+            if ($is_affiliate_request) {
                 $new_referral_code = 'ref_' . uniqid() . $new_user_id;
-                $sql_insert_affiliate = "INSERT INTO affiliates (user_id, referral_code, status) VALUES (?, ?, 'inactive')";
-                $stmt_insert_affiliate = $db->prepare($sql_insert_affiliate);
-                $stmt_insert_affiliate->execute([$new_user_id, $new_referral_code]);
+                $stmt_insert_affiliate = $conn->prepare("INSERT INTO affiliates (user_id, referral_code, status) VALUES (?, ?, 'inactive')");
+                $stmt_insert_affiliate->bind_param("is", $new_user_id, $new_referral_code);
+                $stmt_insert_affiliate->execute();
                 $_SESSION['message'] = "Registration successful! Your affiliate application has been submitted for review.";
             } else {
                 $_SESSION['message'] = "Registration successful! You can now log in.";
             }
 
-            $db->commit();
+            $conn->commit();
 
             // Clear the cookie after successful registration
             setcookie('affiliate_ref', '', time() - 3600, "/");
@@ -92,10 +98,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("location: " . SITE_URL . "login/");
             exit;
         } catch (Exception $e) {
-            $db->rollBack();
-            $errors[] = "Something went wrong. Please try again later. " . $e->getMessage();
+            $conn->rollback();
+            $errors[] = "Something went wrong. Please try again later.";
         }
     }
+    $conn->close();
 }
 
 $pageTitle = "Register";

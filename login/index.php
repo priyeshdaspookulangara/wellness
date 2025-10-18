@@ -46,12 +46,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if ($stmt->fetch()) {
                         if (password_verify($password, $hashed_password)) {
                             // Password is correct, so start a new session
-                            // session_start() is already at the top
+                            // Preserve the guest cart
+                            $guest_cart = $_SESSION['cart'] ?? [];
 
-                            // Store data in session variables
+                            // Fetch user's existing cart from a more persistent source if available
+                            // For this example, we assume the cart is only in the session.
+                            // A more robust implementation would save the cart to the database.
+
+                            // Regenerate session ID for security
+                            session_regenerate_id(true);
+
+                            // Store user data in new session
                             $_SESSION["user_id"] = $id;
                             $_SESSION["user_name"] = $name;
                             $_SESSION["is_admin"] = $is_admin;
+
+                            // Merge carts: guest cart items are added to the user's session cart
+                            if (!isset($_SESSION['cart'])) {
+                                $_SESSION['cart'] = [];
+                            }
+                            foreach ($guest_cart as $product_id => $quantity) {
+                                if (isset($_SESSION['cart'][$product_id])) {
+                                    $_SESSION['cart'][$product_id] += $quantity;
+                                } else {
+                                    $_SESSION['cart'][$product_id] = $quantity;
+                                }
+                            }
 
                             // Redirect user based on is_admin flag
                             if ($is_admin == 1) {

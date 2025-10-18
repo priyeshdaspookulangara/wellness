@@ -12,7 +12,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$db = db_connect();
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Handle order placement
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -32,9 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Verify address belongs to user
-    $stmt = $db->prepare("SELECT id FROM addresses WHERE id = ? AND user_id = ?");
-    $stmt->execute([$address_id, $user_id]);
-    if ($stmt->rowCount() == 0) {
+    $stmt = $conn->prepare("SELECT id FROM addresses WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("ii", $address_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows == 0) {
         $_SESSION['message'] = "Invalid address selected.";
         $_SESSION['message_type'] = "danger";
         header('Location: ' . SITE_URL . 'checkout/');
@@ -43,10 +48,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Fetch product details and calculate total
     $product_ids = array_keys($cart);
-    $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-    $stmt_products = $db->prepare("SELECT id, price FROM products WHERE id IN ($placeholders)");
-    $stmt_products->execute($product_ids);
-    $products = $stmt_products->fetchAll(PDO::FETCH_KEY_PAIR);
+    $in = str_repeat('?,', count($product_ids) - 1) . '?';
+    $stmt_products = $conn->prepare("SELECT id, price FROM products WHERE id IN ($in)");
+    $stmt_products->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
+    $stmt_products->execute();
+    $products_result = $stmt_products->get_result();
+    $products = [];
+    while ($row = $products_result->fetch_assoc()) {
+        $products[$row['id']] = $row['price'];
+    }
 
     $total_amount = 0;
     foreach ($cart as $product_id => $quantity) {
@@ -55,61 +65,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    $conn->begin_transaction();
     try {
-        $db->beginTransaction();
-
         // 1. Create order
         $payment_method = $_POST['payment_method'] ?? 'cod';
         $order_status = ($payment_method === 'cod') ? 'processing' : 'completed';
 
-        $stmt_order = $db->prepare("INSERT INTO orders (user_id, address_id, total_amount, status, payment_method) VALUES (?, ?, ?, ?, ?)");
-        $stmt_order->execute([$user_id, $address_id, $total_amount, $order_status, $payment_method]);
-        $order_id = $db->lastInsertId();
+        $stmt_order = $conn->prepare("INSERT INTO orders (user_id, address_id, total_amount, status, payment_method) VALUES (?, ?, ?, ?, ?)");
+        $stmt_order->bind_param("isdss", $user_id, $address_id, $total_amount, $order_status, $payment_method);
+        $stmt_order->execute();
+        $order_id = $conn->insert_id;
 
         // 2. Create order items
-        $stmt_items = $db->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+        $stmt_items = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
         foreach ($cart as $product_id => $quantity) {
             if (isset($products[$product_id])) {
-                $stmt_items->execute([$order_id, $product_id, $quantity, $products[$product_id]]);
+                $stmt_items->bind_param("iiid", $order_id, $product_id, $quantity, $products[$product_id]);
+                $stmt_items->execute();
             }
         }
 
         // 3. Commission calculation
-        $stmt_referral = $db->prepare("SELECT affiliate_id FROM referrals WHERE referred_user_id = ?");
-        $stmt_referral->execute([$user_id]);
-        $referral = $stmt_referral->fetch(PDO::FETCH_ASSOC);
+        $stmt_referral = $conn->prepare("SELECT affiliate_id FROM referrals WHERE referred_user_id = ?");
+        $stmt_referral->bind_param("i", $user_id);
+        $stmt_referral->execute();
+        $referral_result = $stmt_referral->get_result();
+        $referral = $referral_result->fetch_assoc();
 
         if ($referral) {
             // Fetch commission rate from settings
-            $stmt_rate = $db->prepare("SELECT setting_value FROM settings WHERE setting_key = 'affiliate_commission_rate'");
+            $stmt_rate = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = 'affiliate_commission_rate'");
             $stmt_rate->execute();
-            $commission_rate_percent = $stmt_rate->fetchColumn();
+            $rate_result = $stmt_rate->get_result();
+            $commission_rate_percent = $rate_result->fetch_assoc()['setting_value'] ?? '10';
             $commission_rate = is_numeric($commission_rate_percent) ? (float)$commission_rate_percent / 100 : 0.10; // Default to 10%
 
             $affiliate_id = $referral['affiliate_id'];
             $commission_amount = $total_amount * $commission_rate;
 
-            $stmt_commission = $db->prepare("INSERT INTO commissions (affiliate_id, order_id, commission_amount, status) VALUES (?, ?, ?, 'pending')");
-            $stmt_commission->execute([$affiliate_id, $order_id, $commission_amount]);
+            $stmt_commission = $conn->prepare("INSERT INTO commissions (affiliate_id, order_id, commission_amount, status) VALUES (?, ?, ?, 'pending')");
+            $stmt_commission->bind_param("iids", $affiliate_id, $order_id, $commission_amount);
+            $stmt_commission->execute();
         }
 
         // 4. Send confirmation email
-        $stmt_customer = $db->prepare("SELECT name, email FROM users WHERE id = ?");
-        $stmt_customer->execute([$user_id]);
-        $customer = $stmt_customer->fetch(PDO::FETCH_ASSOC);
+        $stmt_customer = $conn->prepare("SELECT name, email FROM users WHERE id = ?");
+        $stmt_customer->bind_param("i", $user_id);
+        $stmt_customer->execute();
+        $customer_result = $stmt_customer->get_result();
+        $customer = $customer_result->fetch_assoc();
         $customer_name = $customer['name'];
 
-        $stmt_order_details = $db->prepare("SELECT * FROM orders WHERE id = ?");
-        $stmt_order_details->execute([$order_id]);
-        $order = $stmt_order_details->fetch(PDO::FETCH_ASSOC);
+        $stmt_order_details = $conn->prepare("SELECT * FROM orders WHERE id = ?");
+        $stmt_order_details->bind_param("i", $order_id);
+        $stmt_order_details->execute();
+        $order_result = $stmt_order_details->get_result();
+        $order = $order_result->fetch_assoc();
 
-        $stmt_order_items = $db->prepare("SELECT oi.quantity, oi.price, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
-        $stmt_order_items->execute([$order_id]);
-        $order_items = $stmt_order_items->fetchAll(PDO::FETCH_ASSOC);
+        $stmt_order_items = $conn->prepare("SELECT oi.quantity, oi.price, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
+        $stmt_order_items->bind_param("i", $order_id);
+        $stmt_order_items->execute();
+        $items_result = $stmt_order_items->get_result();
+        $order_items = [];
+        while($row = $items_result->fetch_assoc()){
+            $order_items[] = $row;
+        }
 
-        $stmt_address = $db->prepare("SELECT * FROM addresses WHERE id = ?");
-        $stmt_address->execute([$address_id]);
-        $shipping_address = $stmt_address->fetch(PDO::FETCH_ASSOC);
+
+        $stmt_address = $conn->prepare("SELECT * FROM addresses WHERE id = ?");
+        $stmt_address->bind_param("i", $address_id);
+        $stmt_address->execute();
+        $address_result = $stmt_address->get_result();
+        $shipping_address = $address_result->fetch_assoc();
 
         ob_start();
         include BASE_PATH . 'templates/emails/order_confirmation.php';
@@ -123,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         mail($to, $subject, $email_body, $headers);
 
-        $db->commit();
+        $conn->commit();
 
         // 5. Clear cart and redirect to success page
         unset($_SESSION['cart']);
@@ -132,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
 
     } catch (Exception $e) {
-        $db->rollBack();
+        $conn->rollback();
         $_SESSION['message'] = "There was an error processing your order. Please try again.";
         $_SESSION['message_type'] = "danger";
         header('Location: ' . SITE_URL . 'checkout/');
@@ -151,16 +178,26 @@ if (empty($cart)) {
 }
 
 // Fetch addresses
-$stmt_addr = $db->prepare("SELECT * FROM addresses WHERE user_id = ? ORDER BY is_default DESC");
-$stmt_addr->execute([$user_id]);
-$addresses = $stmt_addr->fetchAll(PDO::FETCH_ASSOC);
+$stmt_addr = $conn->prepare("SELECT * FROM addresses WHERE user_id = ? ORDER BY is_default DESC");
+$stmt_addr->bind_param("i", $user_id);
+$stmt_addr->execute();
+$result_addr = $stmt_addr->get_result();
+$addresses = [];
+while($row = $result_addr->fetch_assoc()){
+    $addresses[] = $row;
+}
 
 // Fetch cart item details
 $product_ids_cart = array_keys($cart);
 $placeholders_cart = implode(',', array_fill(0, count($product_ids_cart), '?'));
-$stmt_cart_items = $db->prepare("SELECT id, name, price, image_url_main as image, is_cod_available FROM products WHERE id IN ($placeholders_cart)");
-$stmt_cart_items->execute($product_ids_cart);
-$products_in_cart = $stmt_cart_items->fetchAll(PDO::FETCH_ASSOC);
+$stmt_cart_items = $conn->prepare("SELECT id, name, price, image_url_main as image, is_cod_available FROM products WHERE id IN ($placeholders_cart)");
+$stmt_cart_items->bind_param(str_repeat('i', count($product_ids_cart)), ...$product_ids_cart);
+$stmt_cart_items->execute();
+$result_cart_items = $stmt_cart_items->get_result();
+$products_in_cart = [];
+while($row = $result_cart_items->fetch_assoc()){
+    $products_in_cart[] = $row;
+}
 
 $all_items_cod_available = true;
 foreach ($products_in_cart as $product) {

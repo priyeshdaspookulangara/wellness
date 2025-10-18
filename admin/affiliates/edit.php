@@ -16,24 +16,24 @@ if (!$affiliate_id) {
     exit;
 }
 
-$db = db_connect();
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Fetch affiliate data first, as it's needed for both POST handling and form display
-$sql_affiliate = "
-    SELECT a.id, a.referral_code, a.status, u.name, u.email
-    FROM affiliates a
-    JOIN users u ON a.user_id = u.id
-    WHERE a.id = ?
-";
-$stmt_affiliate = $db->prepare($sql_affiliate);
-$stmt_affiliate->execute([$affiliate_id]);
-$affiliate = $stmt_affiliate->fetch(PDO::FETCH_ASSOC);
-
-if (!$affiliate) {
+$stmt_affiliate = $conn->prepare("SELECT a.id, a.referral_code, a.status, u.name, u.email FROM affiliates a JOIN users u ON a.user_id = u.id WHERE a.id = ?");
+$stmt_affiliate->bind_param("i", $affiliate_id);
+$stmt_affiliate->execute();
+$result_affiliate = $stmt_affiliate->get_result();
+if ($result_affiliate->num_rows === 0) {
     $_SESSION['error_message'] = "Affiliate not found.";
     header("Location: " . SITE_URL . "admin/affiliates/");
     exit;
 }
+$affiliate = $result_affiliate->fetch_assoc();
+$stmt_affiliate->close();
+
 
 $error_message = '';
 $success_message = '';
@@ -48,18 +48,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Check if referral code is unique (if changed)
         if ($referral_code !== $affiliate['referral_code']) {
-            $sql_check = "SELECT id FROM affiliates WHERE referral_code = ? AND id != ?";
-            $stmt_check = $db->prepare($sql_check);
-            $stmt_check->execute([$referral_code, $affiliate_id]);
-            if ($stmt_check->fetch()) {
+            $stmt_check = $conn->prepare("SELECT id FROM affiliates WHERE referral_code = ? AND id != ?");
+            $stmt_check->bind_param("si", $referral_code, $affiliate_id);
+            $stmt_check->execute();
+            $result_check = $stmt_check->get_result();
+            if ($result_check->num_rows > 0) {
                 $error_message = "This referral code is already in use.";
             }
         }
 
         if (empty($error_message)) {
-            $sql_update = "UPDATE affiliates SET referral_code = ?, status = ? WHERE id = ?";
-            $stmt_update = $db->prepare($sql_update);
-            if ($stmt_update->execute([$referral_code, $status, $affiliate_id])) {
+            $stmt_update = $conn->prepare("UPDATE affiliates SET referral_code = ?, status = ? WHERE id = ?");
+            $stmt_update->bind_param("ssi", $referral_code, $status, $affiliate_id);
+            if ($stmt_update->execute()) {
                 $_SESSION['success_message'] = "Affiliate updated successfully.";
                 header("Location: " . SITE_URL . "admin/affiliates/");
                 exit;

@@ -11,17 +11,27 @@ $products_in_cart = [];
 $total = 0;
 
 if (!empty($cart)) {
-    $db = db_connect();
-    $product_ids = array_keys($cart);
-    $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
-    $stmt = $db->prepare("SELECT id, name, price, image_url_main as image FROM products WHERE id IN ($placeholders)");
-    $stmt->execute($product_ids);
-    $products_in_cart = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $product_ids = array_keys($cart);
+    $in = str_repeat('?,', count($product_ids) - 1) . '?';
+    $stmt = $conn->prepare("SELECT id, name, price, image_url_main as image FROM products WHERE id IN ($in)");
+    $stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $products_in_cart[] = $row;
+    }
+    $stmt->close();
 
     foreach ($products_in_cart as $product) {
         $total += $product['price'] * $cart[$product['id']];
     }
+    $conn->close();
 }
 
 ?>

@@ -20,16 +20,26 @@ $error_message = $_SESSION['error_message'] ?? null;
 unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // Fetch affiliates
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 $sql_affiliates = "
     SELECT a.id, a.referral_code, a.status, a.created_at, u.name, u.email
     FROM affiliates a
     JOIN users u ON a.user_id = u.id
     ORDER BY a.created_at DESC
 ";
-$db = db_connect();
-$stmt = $db->prepare($sql_affiliates);
+$stmt = $conn->prepare($sql_affiliates);
 $stmt->execute();
-$affiliates_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$result = $stmt->get_result();
+$affiliates_list = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $affiliates_list[] = $row;
+    }
+}
+$stmt->close();
 
 ?>
 

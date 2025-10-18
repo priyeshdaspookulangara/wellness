@@ -10,7 +10,11 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || !$_SESSION[
     exit;
 }
 
-$db = db_connect();
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
 $error_message = '';
 $success_message = '';
 
@@ -23,15 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Please select a user and provide a referral code.";
     } else {
         // Check if referral code is unique
-        $sql_check = "SELECT id FROM affiliates WHERE referral_code = ?";
-        $stmt_check = $db->prepare($sql_check);
-        $stmt_check->execute([$referral_code]);
-        if ($stmt_check->fetch()) {
+        $stmt_check = $conn->prepare("SELECT id FROM affiliates WHERE referral_code = ?");
+        $stmt_check->bind_param("s", $referral_code);
+        $stmt_check->execute();
+        $result_check = $stmt_check->get_result();
+        if ($result_check->num_rows > 0) {
             $error_message = "This referral code is already in use.";
         } else {
-            $sql_insert = "INSERT INTO affiliates (user_id, referral_code, status) VALUES (?, ?, 'active')";
-            $stmt_insert = $db->prepare($sql_insert);
-            if ($stmt_insert->execute([$user_id, $referral_code])) {
+            $stmt_insert = $conn->prepare("INSERT INTO affiliates (user_id, referral_code, status) VALUES (?, ?, 'active')");
+            $stmt_insert->bind_param("is", $user_id, $referral_code);
+            if ($stmt_insert->execute()) {
                 $_SESSION['success_message'] = "Affiliate added successfully.";
                 header("Location: " . SITE_URL . "admin/affiliates/");
                 exit;
@@ -52,9 +57,13 @@ require_once __DIR__ . '/../includes/header.php';
 
 // Fetch users who are not already affiliates
 $sql_users = "SELECT id, name, email FROM users WHERE id NOT IN (SELECT user_id FROM affiliates)";
-$stmt_users = $db->prepare($sql_users);
-$stmt_users->execute();
-$users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
+$result = $conn->query($sql_users);
+$users = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $users[] = $row;
+    }
+}
 
 ?>
 

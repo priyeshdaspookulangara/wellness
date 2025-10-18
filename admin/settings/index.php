@@ -10,7 +10,11 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || !$_SESSION[
     exit;
 }
 
-$db = db_connect();
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
 $success_message = '';
 $error_message = '';
 
@@ -20,19 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate that it's a number
     if (is_numeric($commission_rate) && $commission_rate >= 0 && $commission_rate <= 100) {
-        try {
-            // Use an UPSERT-like query to either update the existing key or insert a new one
-            $sql = "INSERT INTO settings (setting_key, setting_value) VALUES ('affiliate_commission_rate', ?)
-                    ON DUPLICATE KEY UPDATE setting_value = ?";
-            $stmt = $db->prepare($sql);
-            if ($stmt->execute([$commission_rate, $commission_rate])) {
-                $success_message = "Settings updated successfully.";
-            } else {
-                $error_message = "Failed to update settings.";
-            }
-        } catch (PDOException $e) {
-            $error_message = "Database error: " . $e->getMessage();
+        // Use an UPSERT-like query to either update the existing key or insert a new one
+        $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('affiliate_commission_rate', ?) ON DUPLICATE KEY UPDATE setting_value = ?");
+        $stmt->bind_param("ss", $commission_rate, $commission_rate);
+        if ($stmt->execute()) {
+            $success_message = "Settings updated successfully.";
+        } else {
+            $error_message = "Failed to update settings.";
         }
+        $stmt->close();
     } else {
         $error_message = "Please enter a valid commission rate (a number between 0 and 100).";
     }
@@ -40,18 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch current setting value
 $commission_rate_value = '10'; // Default value
-try {
-    $stmt = $db->prepare("SELECT setting_value FROM settings WHERE setting_key = 'affiliate_commission_rate'");
-    $stmt->execute();
-    $result = $stmt->fetchColumn();
-    if ($result !== false) {
-        $commission_rate_value = $result;
-    }
-} catch (PDOException $e) {
-    // If the table or key doesn't exist, we'll use the default.
-    // A more robust system might log this error.
-    $error_message = "Could not fetch current settings. The `settings` table might not exist.";
+$stmt = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = 'affiliate_commission_rate'");
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result->num_rows > 0) {
+    $commission_rate_value = $result->fetch_assoc()['setting_value'];
 }
+$stmt->close();
 
 
 $page_title = "Site Settings";

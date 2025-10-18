@@ -16,17 +16,20 @@ if (!$affiliate_id) {
     exit;
 }
 
-$db = db_connect();
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // We can choose to just delete the affiliate record.
 // Commissions and referrals will remain, but will no longer be associated with an active affiliate.
 // Alternatively, we could set the status to 'deleted' or handle related records.
 // For simplicity, we will delete the affiliate record.
 
-$sql_delete = "DELETE FROM affiliates WHERE id = ?";
-$stmt_delete = $db->prepare($sql_delete);
+$stmt_delete = $conn->prepare("DELETE FROM affiliates WHERE id = ?");
+$stmt_delete->bind_param("i", $affiliate_id);
 
-if ($stmt_delete->execute([$affiliate_id])) {
+if ($stmt_delete->execute()) {
     $_SESSION['success_message'] = "Affiliate deleted successfully.";
 } else {
     $_SESSION['error_message'] = "Failed to delete affiliate. Please try again.";

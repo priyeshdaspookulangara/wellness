@@ -10,32 +10,41 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 $user_id = $_SESSION["user_id"];
-$db = db_connect();
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Check if the user is an affiliate
-$stmt = $db->prepare("SELECT id, referral_code FROM affiliates WHERE user_id = ? AND status = 'active'");
-$stmt->execute([$user_id]);
-$affiliate = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$affiliate) {
+$stmt = $conn->prepare("SELECT id, referral_code FROM affiliates WHERE user_id = ? AND status = 'active'");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result->num_rows === 0) {
     // If not an affiliate, redirect to account dashboard
     $_SESSION['message'] = "You do not have an active affiliate account.";
     $_SESSION['message_type'] = "warning";
     header("location: " . SITE_URL . "account/");
     exit;
 }
+$affiliate = $result->fetch_assoc();
+$stmt->close();
+
 
 $affiliate_id = $affiliate['id'];
 $referral_code = $affiliate['referral_code'];
 
 // Fetch summary data
 // Total Referrals
-$stmt_referrals = $db->prepare("SELECT COUNT(*) as total_referrals FROM referrals WHERE affiliate_id = ?");
-$stmt_referrals->execute([$affiliate_id]);
-$total_referrals = $stmt_referrals->fetchColumn();
+$stmt_referrals = $conn->prepare("SELECT COUNT(*) as total_referrals FROM referrals WHERE affiliate_id = ?");
+$stmt_referrals->bind_param("i", $affiliate_id);
+$stmt_referrals->execute();
+$result_referrals = $stmt_referrals->get_result();
+$total_referrals = $result_referrals->fetch_assoc()['total_referrals'];
+$stmt_referrals->close();
 
 // Commission stats
-$stmt_commissions = $db->prepare("
+$stmt_commissions = $conn->prepare("
     SELECT
         SUM(commission_amount) as total_earnings,
         SUM(CASE WHEN status = 'paid' THEN commission_amount ELSE 0 END) as paid_earnings,
@@ -43,13 +52,25 @@ $stmt_commissions = $db->prepare("
     FROM commissions
     WHERE affiliate_id = ?
 ");
-$stmt_commissions->execute([$affiliate_id]);
-$commission_stats = $stmt_commissions->fetch(PDO::FETCH_ASSOC);
+$stmt_commissions->bind_param("i", $affiliate_id);
+$stmt_commissions->execute();
+$result_commissions = $stmt_commissions->get_result();
+$commission_stats = $result_commissions->fetch_assoc();
+$stmt_commissions->close();
+
 
 // Fetch detailed commission history
-$stmt_history = $db->prepare("SELECT order_id, commission_amount, status, created_at FROM commissions WHERE affiliate_id = ? ORDER BY created_at DESC");
-$stmt_history->execute([$affiliate_id]);
-$commissions = $stmt_history->fetchAll(PDO::FETCH_ASSOC);
+$stmt_history = $conn->prepare("SELECT order_id, commission_amount, status, created_at FROM commissions WHERE affiliate_id = ? ORDER BY created_at DESC");
+$stmt_history->bind_param("i", $affiliate_id);
+$stmt_history->execute();
+$result_history = $stmt_history->get_result();
+$commissions = [];
+if ($result_history) {
+    while ($row = $result_history->fetch_assoc()) {
+        $commissions[] = $row;
+    }
+}
+$stmt_history->close();
 
 $pageTitle = "Affiliate Dashboard";
 include_once '../../templates/header.php';

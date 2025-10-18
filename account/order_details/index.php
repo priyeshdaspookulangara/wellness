@@ -24,7 +24,7 @@ if ($conn->connect_error) {
 
 // Fetch order details, ensuring it belongs to the logged-in user
 $stmt = $conn->prepare(
-    "SELECT o.*, a.address_line1, a.address_line2, a.city, a.state, a.postal_code, a.country
+    "SELECT o.*, a.address_line1, a.address_line2, a.city, a.state, a.postal_code, a.country, o.payment_method
      FROM orders o
      LEFT JOIN addresses a ON o.address_id = a.id
      WHERE o.id = ? AND o.user_id = ?"
