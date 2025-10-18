@@ -86,7 +86,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                         <td><?php echo $product['is_featured'] ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>'; ?></td>
                         <td><?php echo $product['is_on_sale'] ? '<span class="badge bg-warning text-dark">Yes</span>' : '<span class="badge bg-secondary">No</span>'; ?></td>
                         <td class="action-buttons">
-                            <a href="../product_edit/?id=<?php echo $product['id']; ?>" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a> <!-- Corrected link -->
+                            <a href="../product_edit/index.php?id=<?php echo $product['id']; ?>" class="btn btn-sm btn-info" title="Edit"><i class="fas fa-edit"></i></a> <!-- Corrected link -->
                             <a href="<?php echo SITE_URL . 'admin/product_delete.php?id=' . $product['id']; ?>" class="btn btn-sm btn-danger confirm-delete" title="Delete"><i class="fas fa-trash"></i></a> <!-- product_delete.php is in admin root -->
                         </td>
                     </tr>

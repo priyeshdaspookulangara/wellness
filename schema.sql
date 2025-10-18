@@ -43,6 +43,7 @@ CREATE TABLE `orders` (
   `address_id` int(11) NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'pending',
+  `payment_method` varchar(50) NOT NULL DEFAULT 'cod',
   `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),

@@ -24,7 +24,7 @@ if ($conn->connect_error) {
 
 // Fetch order details, ensuring it belongs to the logged-in user
 $stmt = $conn->prepare(
-    "SELECT o.*, a.address_line1, a.address_line2, a.city, a.state, a.postal_code, a.country
+    "SELECT o.*, a.address_line1, a.address_line2, a.city, a.state, a.postal_code, a.country, o.payment_method
      FROM orders o
      LEFT JOIN addresses a ON o.address_id = a.id
      WHERE o.id = ? AND o.user_id = ?"
@@ -105,6 +105,7 @@ include_once '../../templates/header.php';
                         <div class="card-body">
                             <p><strong>Order Date:</strong> <?php echo htmlspecialchars(date("F j, Y", strtotime($order['order_date']))); ?></p>
                             <p><strong>Status:</strong> <?php echo htmlspecialchars(ucfirst($order['status'])); ?></p>
+                            <p><strong>Payment Method:</strong> <?php echo isset($order['payment_method']) ? htmlspecialchars(ucfirst($order['payment_method'])) : 'N/A'; ?></p>
                             <p class="h5"><strong>Total:</strong> $<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></p>
                         </div>
                     </div>

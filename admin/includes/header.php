@@ -60,6 +60,10 @@ if ($active_section == 'index.php') $active_section = 'dashboard';
                 <a class="nav-link" href="<?php echo SITE_URL; ?>admin/users/"><i class="fas fa-users"></i> Users</a>
             </li>
 
+            <li class="nav-item <?php echo ($active_section == 'affiliates') ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?php echo SITE_URL; ?>admin/affiliates/"><i class="fas fa-handshake"></i> Affiliates</a>
+            </li>
+
             <li class="nav-item">
                 <a href="#contentSubmenu" data-bs-toggle="collapse" aria-expanded="<?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? 'true' : 'false'; ?>" class="nav-link dropdown-toggle <?php echo in_array($active_section, ['blog_posts', 'testimonials', 'content_edit']) ? '' : 'collapsed'; ?>">
                     <i class="fas fa-file-alt"></i> Content
@@ -80,6 +84,9 @@ if ($active_section == 'index.php') $active_section = 'dashboard';
                     <li><a class="nav-link <?php echo ($active_section == 'reports_inventory') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/reports_inventory/">Inventory Reports</a></li>
                     <li><a class="nav-link <?php echo ($active_section == 'reports_customers') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>admin/reports_customers/">Customer Reports</a></li>
                 </ul>
+            </li>
+            <li class="nav-item <?php echo ($active_section == 'settings') ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?php echo SITE_URL; ?>admin/settings/"><i class="fas fa-cog"></i> Settings</a>
             </li>
             <hr class="sidebar-divider">
             <li class="nav-item">

@@ -1,21 +1,46 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config.php'; // Corrected
-require_once __DIR__ . '/../../includes/db.php'; // Corrected
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../includes/db.php';
 
 // Admin authentication check
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
     $_SESSION['admin_error'] = "Access denied.";
-    header("Location: " . SITE_URL . "login/"); // Corrected redirect
+    header("Location: " . SITE_URL . "login/");
     exit;
 }
 
-$page_title = "Add New Product";
+$product_id = (int)($_GET['id'] ?? 0);
+if (!$product_id) {
+    $_SESSION['error_message'] = "Invalid product ID.";
+    header("Location: " . SITE_URL . "admin/products/");
+    exit;
+}
+
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch product data
+$stmt_product = $conn->prepare("SELECT * FROM products WHERE id = ?");
+$stmt_product->bind_param("i", $product_id);
+$stmt_product->execute();
+$result_product = $stmt_product->get_result();
+if ($result_product->num_rows === 0) {
+    $_SESSION['error_message'] = "Product not found.";
+    header("Location: " . SITE_URL . "admin/products/");
+    exit;
+}
+$product_data = $result_product->fetch_assoc();
+$stmt_product->close();
+
+$page_title = "Edit Product: " . htmlspecialchars($product_data['name']);
 $breadcrumbs = [
     ['name' => 'Products', 'link' => SITE_URL . 'admin/products/'],
-    ['name' => 'Add New Product']
+    ['name' => 'Edit Product']
 ];
-require_once __DIR__ . '/../includes/header.php'; // Corrected
+require_once __DIR__ . '/../includes/header.php';
 
 // Fetch categories for dropdown
 $sql_categories = "SELECT id, name FROM categories ORDER BY name ASC";
@@ -28,12 +53,6 @@ if ($result_categories) {
 }
 
 $errors = [];
-$product_data = [
-    'name' => '', 'slug' => '', 'category_id' => '', 'description' => '', 'how_it_works' => '',
-    'health_benefits_text' => '', 'gauss_strength' => '', 'material_quality_design' => '',
-    'usage_guide_text' => '', 'price' => '', 'stock' => 0, 'is_featured' => 0, 'is_on_sale' => 0,
-    'sale_price' => null
-];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize and retrieve form data
@@ -53,9 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_data['is_cod_available'] = isset($_POST['is_cod_available']) ? 1 : 0;
     $product_data['sale_price'] = !empty($_POST['sale_price']) ? trim($_POST['sale_price']) : null;
 
-    // Validation (same as before)
+    // Validation
     if (empty($product_data['name'])) $errors[] = "Product name is required.";
-    // ... (other validations remain the same) ...
     if (empty($product_data['category_id'])) $errors[] = "Category is required.";
     if (empty($product_data['description'])) $errors[] = "Description is required.";
     if (!is_numeric($product_data['price']) || $product_data['price'] < 0) $errors[] = "Valid price is required.";
@@ -63,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($product_data['is_on_sale'] && (empty($product_data['sale_price']) || !is_numeric($product_data['sale_price']) || $product_data['sale_price'] < 0)) {
         $errors[] = "Valid sale price is required if product is marked as on sale.";
     }
-     if (empty($product_data['slug'])) {
+    if (empty($product_data['slug'])) {
         $product_data['slug'] = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $product_data['name']), '-'));
     } else {
         if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $product_data['slug'])) {
@@ -71,9 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $image_file_name = null;
+    $image_file_name = $product_data['image_url_main'];
     if (isset($_FILES['image_url_main']) && $_FILES['image_url_main']['error'] == UPLOAD_ERR_OK) {
-        $upload_dir = __DIR__ . '/../../uploads/'; // Corrected path to root uploads
+        $upload_dir = __DIR__ . '/../../uploads/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0775, true);
         }
@@ -87,23 +105,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = "Image file size exceeds 2MB limit.";
         } elseif (!move_uploaded_file($_FILES['image_url_main']['tmp_name'], $target_file)) {
             $errors[] = "Failed to upload image.";
-            $image_file_name = null;
+            $image_file_name = $product_data['image_url_main'];
         }
     }
 
     if (empty($errors)) {
-        $stmt_check = $conn->prepare("SELECT id FROM products WHERE slug = ?");
-        $stmt_check->bind_param("s", $product_data['slug']);
+        $stmt_check = $conn->prepare("SELECT id FROM products WHERE slug = ? AND id != ?");
+        $stmt_check->bind_param("si", $product_data['slug'], $product_id);
         $stmt_check->execute();
         $result_check = $stmt_check->get_result();
         if ($result_check->num_rows > 0) {
             $errors[] = "Product slug already exists. Please choose a unique slug.";
         } else {
-            $sql_insert = "INSERT INTO products (name, slug, category_id, description, how_it_works, health_benefits_text, gauss_strength, material_quality_design, usage_guide_text, price, stock, image_url_main, is_featured, is_on_sale, is_cod_available, sale_price, created_at, updated_at)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
-            $stmt_insert = $conn->prepare($sql_insert);
-            $stmt_insert->bind_param(
-                "ssissssssdisiiids",
+            $sql_update = "UPDATE products SET name=?, slug=?, category_id=?, description=?, how_it_works=?, health_benefits_text=?, gauss_strength=?, material_quality_design=?, usage_guide_text=?, price=?, stock=?, image_url_main=?, is_featured=?, is_on_sale=?, is_cod_available=?, sale_price=?, updated_at=NOW() WHERE id=?";
+            $stmt_update = $conn->prepare($sql_update);
+            $stmt_update->bind_param(
+                "ssissssssdisiiidsi",
                 $product_data['name'],
                 $product_data['slug'],
                 $product_data['category_id'],
@@ -119,18 +136,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $product_data['is_featured'],
                 $product_data['is_on_sale'],
                 $product_data['is_cod_available'],
-                $product_data['sale_price']
+                $product_data['sale_price'],
+                $product_id
             );
 
-            if ($stmt_insert->execute()) {
-                $_SESSION['success_message'] = "Product added successfully!";
-                header("Location: " . SITE_URL . "admin/products/"); // Corrected redirect
+            if ($stmt_update->execute()) {
+                $_SESSION['success_message'] = "Product updated successfully!";
+                header("Location: " . SITE_URL . "admin/products/");
                 exit;
             } else {
-                $errors[] = "Failed to add product: " . $stmt_insert->error;
-                if ($image_file_name && file_exists($upload_dir . $image_file_name)) {
-                    unlink($upload_dir . $image_file_name);
-                }
+                $errors[] = "Failed to update product: " . $stmt_update->error;
             }
         }
     }
@@ -139,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2"><?php echo $page_title; ?></h1>
-    <a href="<?php echo SITE_URL; ?>admin/products/" class="btn btn-sm btn-outline-secondary">Back to Products</a> <!-- Corrected link -->
+    <a href="<?php echo SITE_URL; ?>admin/products/" class="btn btn-sm btn-outline-secondary">Back to Products</a>
 </div>
 
 <?php if (!empty($errors)): ?>
@@ -153,20 +168,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 <?php endif; ?>
 
-<form action="<?php echo SITE_URL; ?>admin/product_add/" method="POST" enctype="multipart/form-data"> <!-- Corrected form action -->
+<form action="<?php echo SITE_URL; ?>admin/product_edit/?id=<?php echo $product_id; ?>" method="POST" enctype="multipart/form-data">
     <div class="row">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">Product Details</div>
                 <div class="card-body">
-                    <!-- Form fields as before, no changes to field names or values needed here for this step -->
                     <div class="form-group mb-3">
                         <label for="name">Product Name</label>
                         <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($product_data['name']); ?>" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="slug">Slug (URL-friendly name, auto-generated if empty)</label>
-                        <input type="text" class="form-control" id="slug" name="slug" value="<?php echo htmlspecialchars($product_data['slug']); ?>" placeholder="e.g., magnetic-therapy-bracelet">
+                        <label for="slug">Slug</label>
+                        <input type="text" class="form-control" id="slug" name="slug" value="<?php echo htmlspecialchars($product_data['slug']); ?>" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="description">Description</label>
@@ -177,8 +191,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <textarea class="form-control" id="how_it_works" name="how_it_works" rows="3"><?php echo htmlspecialchars($product_data['how_it_works']); ?></textarea>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="health_benefits_text">Specific Health Concerns Addressed (comma-separated)</label>
-                        <input type="text" class="form-control" id="health_benefits_text" name="health_benefits_text" value="<?php echo htmlspecialchars($product_data['health_benefits_text']); ?>" placeholder="e.g., Supports Joint Health, Aids Stress Reduction">
+                        <label for="health_benefits_text">Specific Health Concerns Addressed</label>
+                        <input type="text" class="form-control" id="health_benefits_text" name="health_benefits_text" value="<?php echo htmlspecialchars($product_data['health_benefits_text']); ?>">
                     </div>
                     <div class="form-group mb-3">
                         <label for="material_quality_design">Material Quality & Design Details</label>
@@ -203,15 +217,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="stock">Stock Quantity</label>
                         <input type="number" class="form-control" id="stock" name="stock" value="<?php echo htmlspecialchars($product_data['stock']); ?>" required>
                     </div>
-                     <div class="form-group form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="is_on_sale" name="is_on_sale" value="1" <?php echo $product_data['is_on_sale'] ? 'checked' : ''; ?>>
+                    <div class="form-group form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="is_on_sale" name="is_on_sale" value="1" <?php echo !empty($product_data['is_on_sale']) ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="is_on_sale">Is on Sale?</label>
                     </div>
                     <div class="form-group form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="is_cod_available" name="is_cod_available" value="1" checked>
+                        <input type="checkbox" class="form-check-input" id="is_cod_available" name="is_cod_available" value="1" <?php echo !empty($product_data['is_cod_available']) ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="is_cod_available">Pay on Delivery</label>
                     </div>
-                    <div class="form-group mb-3" id="sale_price_group" style="<?php echo $product_data['is_on_sale'] ? '' : 'display:none;'; ?>">
+                    <div class="form-group mb-3" id="sale_price_group" style="<?php echo !empty($product_data['is_on_sale']) ? '' : 'display:none;'; ?>">
                         <label for="sale_price">Sale Price ($)</label>
                         <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" value="<?php echo htmlspecialchars($product_data['sale_price'] ?? ''); ?>">
                     </div>
@@ -233,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="form-group mb-3">
                         <label for="gauss_strength">Magnetic Strength (Gauss)</label>
-                        <input type="text" class="form-control" id="gauss_strength" name="gauss_strength" value="<?php echo htmlspecialchars($product_data['gauss_strength']); ?>" placeholder="e.g., 3000 Gauss">
+                        <input type="text" class="form-control" id="gauss_strength" name="gauss_strength" value="<?php echo htmlspecialchars($product_data['gauss_strength']); ?>">
                     </div>
                 </div>
             </div>
@@ -242,21 +256,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body">
                     <div class="form-group mb-3">
                         <label for="image_url_main">Main Product Image</label>
-                        <input type="file" class="form-control" id="image_url_main" name="image_url_main"> <!-- BS5 uses form-control for file inputs -->
-                        <small class="form-text text-muted">Max 2MB. Allowed types: JPG, PNG, GIF, WEBP.</small>
+                        <input type="file" class="form-control" id="image_url_main" name="image_url_main">
+                        <small class="form-text text-muted">Current: <?php echo htmlspecialchars($product_data['image_url_main'] ?? 'None'); ?></small>
                     </div>
                 </div>
             </div>
-             <div class="card mb-3">
+            <div class="card mb-3">
                 <div class="card-header">Visibility</div>
                 <div class="card-body">
                     <div class="form-group form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1" <?php echo $product_data['is_featured'] ? 'checked' : ''; ?>>
+                        <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1" <?php echo !empty($product_data['is_featured']) ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="is_featured">Feature on homepage</label>
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-block w-100">Add Product</button>
+            <button type="submit" class="btn btn-primary btn-block w-100">Update Product</button>
         </div>
     </div>
 </form>
@@ -275,5 +289,6 @@ $(document).ready(function(){
 </script>
 
 <?php
-require_once __DIR__ . '/../includes/footer.php'; // Corrected
+$conn->close();
+require_once __DIR__ . '/../includes/footer.php';
 ?>

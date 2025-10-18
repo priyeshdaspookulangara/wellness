@@ -25,25 +25,24 @@ $breadcrumbs = [
 require_once __DIR__ . '/../includes/header.php'; // Corrected
 
 // Fetch order details
-$sql_order = "SELECT o.*, u.username AS user_username
-              FROM orders o
-              LEFT JOIN users u ON o.user_id = u.id
-              WHERE o.id = $order_id";
-$result_order = mysqli_query($conn, $sql_order);
+$stmt = $conn->prepare("SELECT o.*, u.username AS user_username, u.email as user_email, a.address_line1, a.address_line2, a.city, a.state, a.postal_code, a.country, o.payment_method FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN addresses a ON o.address_id = a.id WHERE o.id = ?");
+$stmt->bind_param("i", $order_id);
+$stmt->execute();
+$result_order = $stmt->get_result();
 
-if (!$result_order || mysqli_num_rows($result_order) === 0) {
+if ($result_order->num_rows === 0) {
     echo "<div class='alert alert-danger'>Order not found.</div>";
     require_once __DIR__ . '/../includes/footer.php'; // Corrected
     exit;
 }
-$order = mysqli_fetch_assoc($result_order);
+$order = $result_order->fetch_assoc();
+$stmt->close();
 
 // Fetch order items
-$sql_items = "SELECT oi.*, p.slug AS product_slug
-              FROM order_items oi
-              LEFT JOIN products p ON oi.product_id = p.id
-              WHERE oi.order_id = $order_id";
-$result_items = mysqli_query($conn, $sql_items);
+$stmt_items = $conn->prepare("SELECT oi.*, p.slug AS product_slug FROM order_items oi LEFT JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
+$stmt_items->bind_param("i", $order_id);
+$stmt_items->execute();
+$result_items = $stmt_items->get_result();
 $order_items = [];
 if ($result_items) {
     while ($item = mysqli_fetch_assoc($result_items)) {
